@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SVT Secondes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#daf0d7; --surface:#ffffff; --ink:#1d2227; --ink-2:#3a4148; --muted:#5c6e5a; --line:#c2e0bd; --line-2:#abd1a5;
+  --ok:#2f7d4f; --ok-soft:#e8f3ec; --ko:#b8412f; --ko-soft:#f8e9e5;
+  --c:#1f7a8c; --c-soft:rgba(31,122,140,.08); --c-mid:rgba(31,122,140,.22); --c-ink:#15535f;
+  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --r:12px; --ease:cubic-bezier(.2,.75,.25,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.55;font-size:1rem;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;padding:0}
+a{color:var(--c-ink)}
+sup,sub{line-height:0}
+.wrap{max-width:900px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+
+/* ---------- Barre du haut ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;min-height:52px}
+.brand{font-family:var(--serif);font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.crumbs{display:flex;align-items:center;gap:8px;min-width:0;font-size:.88rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.crumbs button{color:var(--muted);padding:8px 0}
+.crumbs .cur{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+
+main{padding:clamp(22px,5vw,44px) 0 56px}
+.view{animation:appear .4s var(--ease)}
+@keyframes appear{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.kicker{font-size:.76rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink);margin:0 0 8px}
+h1,h2,h3{font-family:var(--serif);font-weight:700;letter-spacing:-.005em}
+
+/* ---------- Accueil ---------- */
+.home-head h1{font-size:clamp(2rem,4vw + 1rem,2.9rem);line-height:1.1;margin:0 0 8px}
+.home-head .lead{color:var(--muted);margin:0 0 34px;font-size:1rem}
+.chapter{margin-bottom:38px}
+.ch-head{border-top:3px solid var(--c);padding-top:12px;margin-bottom:14px}
+.ch-head .kicker{margin-bottom:2px}
+.ch-head h2{margin:0;font-size:clamp(1.2rem,1.2vw + .9rem,1.45rem);line-height:1.3}
+.parts{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.part{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .25s,transform .25s var(--ease),box-shadow .25s}
+.part .pid{grid-row:span 3;font-family:var(--serif);font-weight:700;font-size:1.35rem;color:var(--c);line-height:1.2;min-width:30px}
+.part h3{margin:0;font-size:1.1rem;line-height:1.3}
+.part .pq{margin:4px 0 0;font-family:var(--serif);font-style:italic;color:var(--ink-2);font-size:.95rem;line-height:1.5}
+.part .go{margin-top:10px;font-size:.85rem;font-weight:600;color:var(--c-ink)}
+@media (hover:hover){.part:hover{border-color:var(--c);transform:translateY(-2px);box-shadow:0 8px 20px -14px rgba(0,0,0,.3)}}
+.revise{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.revise h3{margin:0;font-size:1.1rem}
+.revise p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.93rem;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);text-decoration:none;transition:background .2s,border-color .2s,color .2s,transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.solid{background:var(--c);border-color:var(--c);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--c-ink);padding-left:0;padding-right:0}
+@media (hover:hover){.btn:hover{border-color:var(--c)}.btn.solid:hover{background:var(--c-ink);border-color:var(--c-ink)}}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* ---------- En-tête de partie ---------- */
+.hero{margin-bottom:20px}
+.hero h1{font-size:clamp(1.65rem,3vw + 1rem,2.5rem);line-height:1.15;margin:0 0 14px}
+.probl{margin:0;padding:4px 0 4px 16px;border-left:3px solid var(--c);font-family:var(--serif);font-style:italic;font-size:clamp(1rem,.5vw + .9rem,1.12rem);color:var(--ink-2);line-height:1.55;max-width:62ch}
+.probl span{display:block;font-family:var(--sans);font-style:normal;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink);margin-bottom:2px}
+
+/* ---------- Onglets ---------- */
+.tabs{position:sticky;top:52px;z-index:20;background:var(--paper);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border-bottom:1px solid var(--line);margin:0 0 24px}
+.tabs button{position:relative;min-width:0;min-height:48px;padding:10px 4px;font-weight:600;font-size:.94rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.tabs button::after{content:"";position:absolute;left:12%;right:12%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--c);transform:scaleX(0);transition:transform .3s var(--ease)}
+.tabs button.on{color:var(--ink)}
+.tabs button.on::after{transform:scaleX(1)}
+
+/* ---------- Activités ---------- */
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;transition:border-color .25s}
+.acc.open{border-color:var(--line-2)}
+.acc-head{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;text-align:left;min-height:64px}
+.acc-head .t{flex:1;min-width:0}
+.acc-head .type{display:block;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink);margin-bottom:2px}
+.acc-head .name{display:block;font-family:var(--serif);font-weight:600;font-size:1.08rem;line-height:1.35}
+.chev{flex:0 0 auto;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px;transition:transform .35s var(--ease)}
+.open > .acc-head .chev,.open > .more-btn .chev{transform:rotate(225deg);margin-bottom:-4px}
+.fold{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}
+.open > .fold{grid-template-rows:1fr}
+.fold > div{overflow:hidden;min-height:0}
+.acc-body{padding:0 18px 20px}
+.summary{font-family:var(--serif);font-size:1.02rem;line-height:1.65;color:var(--ink-2);margin:0 0 16px}
+.corr-title{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.corr-item{margin:0 0 14px}
+.corr-item .cq{display:flex;gap:10px;align-items:baseline;font-weight:600;font-size:.93rem;margin-bottom:3px}
+.corr-item .cq b{flex:0 0 auto;font-size:.74rem;color:var(--c-ink);background:var(--c-soft);border-radius:6px;padding:1px 7px}
+.corr-item .ca{margin:0;font-family:var(--serif);font-size:1rem;line-height:1.6}
+.ext{display:inline-flex;margin-top:4px;font-weight:600;font-size:.9rem;color:var(--c-ink);text-decoration:none;min-height:40px;align-items:center}
+
+/* ---------- Tableaux (en cartes sur téléphone) ---------- */
+.tbl{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
+.tbl table{border-collapse:collapse;width:100%;font-size:.9rem}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.tbl tr:last-child th,.tbl tr:last-child td{border-bottom:none}
+.tbl thead th{background:var(--c-soft);color:var(--c-ink);font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.tbl tbody th{font-weight:600}
+.tbl caption{caption-side:top;text-align:left;padding:10px 12px 0;font-size:.82rem;color:var(--muted)}
+@media (max-width:560px){
+  .tbl{border:none;background:none;overflow:visible}
+  .tbl caption{padding:0 0 8px}
+  .tbl thead{display:none}
+  .tbl table,.tbl tbody,.tbl tr,.tbl th,.tbl td{display:block;width:100%}
+  .tbl tr{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .tbl tbody th{background:var(--c-soft);color:var(--c-ink);border-bottom:1px solid var(--line)}
+  .tbl td{display:flex;justify-content:space-between;gap:14px;text-align:right;border-bottom:1px solid var(--line)}
+  .tbl td:last-child{border-bottom:none}
+  .tbl td::before{content:attr(data-label);text-align:left;color:var(--muted);font-size:.84rem;flex:0 0 42%}
+}
+
+/* ---------- L'essentiel ---------- */
+.toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:-6px 0 26px;padding:0 0 16px;border-bottom:1px solid var(--line)}
+.toc button{font-size:.88rem;color:var(--c-ink);font-weight:600;min-height:36px;text-align:left}
+.toc button span{font-family:var(--serif);margin-right:6px}
+.lesson{max-width:none}
+.lesson section{margin-bottom:34px;scroll-margin-top:110px}
+.lesson h2{font-size:clamp(1.25rem,1vw + 1rem,1.5rem);line-height:1.3;margin:0 0 12px;display:flex;gap:12px;align-items:baseline}
+.lesson h2 .num{color:var(--c);font-weight:700;flex:0 0 auto}
+.lesson p{font-family:var(--serif);font-size:clamp(1.02rem,.3vw + .98rem,1.1rem);line-height:1.75;margin:0 0 14px;color:var(--ink);hyphens:auto;-webkit-hyphens:auto}
+.lesson b{font-weight:700}
+.aside{margin:18px 0;padding:14px 18px;background:var(--c-soft);border-radius:10px}
+.aside .lab{display:block;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink);margin-bottom:4px}
+.aside p{font-size:.98rem;line-height:1.65;margin:0}
+.recap{border:1px solid var(--line-2);background:var(--surface);border-radius:var(--r);padding:18px 20px;margin-top:10px}
+.recap .lab{display:block;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--c-ink);margin-bottom:6px}
+.recap p{margin:0}
+.recap p + p{margin-top:10px}
+.recap p.rt{font-family:var(--sans);font-size:.78rem;font-weight:700;color:var(--ink-2);margin-top:16px}
+.recap .lab + p.rt{margin-top:4px}
+.recap p.rt + p{margin-top:4px}
+.facts{margin:0;padding-left:20px}
+.facts li{font-family:var(--serif);font-size:.98rem;line-height:1.6;margin:3px 0}
+.aside .src{font-size:.8rem;color:var(--muted);margin-top:6px}
+.hint-line{font-size:.85rem;color:var(--muted);margin:0 0 20px}
+.hint-line .term{pointer-events:none}
+
+/* Termes avec définition */
+.term{font:inherit;color:inherit;display:inline;padding:0;border-bottom:1.5px dotted var(--c);cursor:help;border-radius:2px;transition:background .2s}
+.term.active,.term:focus-visible{background:var(--c-mid);outline:none}
+@media (hover:hover){.term:hover{background:var(--c-soft)}}
+.tip{position:absolute;z-index:50;top:0;left:0;background:var(--ink);color:#fff;border-radius:10px;padding:11px 14px 12px;font-size:.9rem;line-height:1.5;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .18s,transform .18s,visibility .18s}
+.tip.show{opacity:1;visibility:visible;transform:none}
+.tip b{display:block;font-family:var(--serif);font-size:1rem;margin-bottom:2px;color:#fff}
+.tip .arrow{position:absolute;top:-6px;width:12px;height:12px;background:var(--ink);transform:rotate(45deg);border-radius:2px}
+.tip.above .arrow{top:auto;bottom:-6px}
+
+/* ---------- Navigation entre parties ---------- */
+.next-nav{display:flex;justify-content:space-between;gap:12px;margin-top:40px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.next-nav button{text-align:left;max-width:48%;min-height:44px}
+.next-nav button:last-child{text-align:right;margin-left:auto}
+.next-nav small{display:block;color:var(--muted);font-size:.78rem}
+.next-nav span{font-family:var(--serif);font-weight:600;color:var(--c-ink)}
+@media (max-width:560px){.next-nav button{max-width:100%}}
+
+/* ---------- Flashcards ---------- */
+.fc-tools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.pills{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.pills button{min-height:36px;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem;color:var(--muted);transition:background .2s,color .2s}
+.pills button.on{background:var(--ink);color:var(--paper)}
+.bar{height:4px;background:var(--line);border-radius:99px;overflow:hidden;max-width:620px;margin:0 auto 16px}
+.bar > i{display:block;height:100%;background:var(--c);border-radius:99px;transition:width .4s var(--ease)}
+.scene{perspective:1400px;max-width:620px;margin:0 auto;touch-action:pan-y}
+.flash{position:relative;width:100%;height:clamp(250px,50vw,340px);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .6s var(--ease);cursor:pointer}
+.flash.flipped{transform:rotateY(180deg)}
+.flash.in{animation:slin .35s var(--ease)}
+.flash.in-back{animation:slback .35s var(--ease)}
+@keyframes slin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes slback{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+.face{position:absolute;top:0;left:0;right:0;bottom:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px clamp(18px,4vw,34px) 30px;text-align:center;overflow:auto}
+.face.front{background:var(--surface);border:1px solid var(--line-2);border-top:4px solid var(--c)}
+.face.back{background:var(--c);color:#fff;transform:rotateY(180deg)}
+.face .lab{position:absolute;top:12px;left:16px;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
+.face .code{position:absolute;top:10px;right:14px;font-size:.72rem;font-weight:700;color:var(--c-ink)}
+.face.back .code{color:#fff;opacity:.8}
+.face .term-big{font-family:var(--serif);font-size:clamp(1.4rem,2.2vw + .9rem,2rem);font-weight:700;line-height:1.25}
+.face .def{font-family:var(--serif);font-size:clamp(1.02rem,.6vw + .88rem,1.2rem);line-height:1.55}
+.face .hint{position:absolute;bottom:10px;font-size:.76rem;opacity:.45}
+.fc-count{text-align:center;color:var(--muted);font-size:.86rem;margin:12px 0 2px}
+.fc-know{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:620px;margin:10px auto 0}
+.fc-know .no{color:var(--ko);background:var(--ko-soft);border-color:transparent}
+.fc-know .yes{color:var(--ok);background:var(--ok-soft);border-color:transparent}
+.fc-ctrl{display:grid;grid-template-columns:48px 1fr 48px;gap:10px;max-width:620px;margin:10px auto 0}
+.fc-ctrl .btn{padding:0}
+.fc-ctrl .arrow{font-size:1.3rem}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.fc-grid .scene{max-width:none;width:100%;margin:0}
+.fc-grid .flash{height:190px}
+.fc-grid .face{padding:28px 14px 14px;border-radius:12px}
+.fc-grid .face .term-big{font-size:1.12rem}
+.fc-grid .face .def{font-size:.9rem}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(22px,5vw,38px);text-align:center;max-width:620px;margin:0 auto}
+.done .big{font-family:var(--serif);font-size:clamp(2.3rem,5vw + 1rem,3.2rem);font-weight:700;color:var(--c);line-height:1}
+.done p{color:var(--muted)}
+.done .row{justify-content:center;margin-top:16px}
+
+/* ---------- QCM ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,30px);max-width:700px;margin:0 auto}
+.panel h3{margin:0 0 4px;font-size:1.25rem}
+.muted{color:var(--muted);font-size:.9rem}
+.set-label{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:40px;padding:6px 14px;border-radius:99px;border:1px solid var(--line-2);font-weight:600;font-size:.88rem;color:var(--ink-2);transition:all .2s}
+.chips button small{color:var(--muted);font-weight:500;margin-left:4px}
+.chips button.on{background:var(--c);border-color:var(--c);color:#fff}
+.chips button.on small{color:rgba(255,255,255,.8)}
+.chips button:disabled{opacity:.35;cursor:default}
+.q-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.84rem;margin-bottom:8px}
+.lvl{font-weight:600;color:var(--c-ink)}
+.q-text{font-family:var(--serif);font-size:clamp(1.12rem,.8vw + .95rem,1.3rem);font-weight:600;line-height:1.45;margin:16px 0 18px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;text-align:left;min-height:52px;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:.97rem;transition:border-color .2s,background .2s,opacity .2s}
+.opt .k{flex:0 0 26px;height:26px;border-radius:7px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:var(--muted)}
+@media (hover:hover){.opt:hover:not([disabled]){border-color:var(--c)}}
+.opt[disabled]{cursor:default}
+.opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.opt.good .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--ko);background:var(--ko-soft)}
+.opt.bad .k{background:var(--ko);color:#fff}
+.opt.dim{opacity:.5}
+.feedback{margin-top:16px;padding:13px 16px;border-radius:10px;font-size:.95rem;animation:appear .3s var(--ease)}
+.feedback.ok{background:var(--ok-soft)}
+.feedback.ko{background:var(--ko-soft)}
+.feedback b{display:block;margin-bottom:2px}
+.feedback.ok b{color:var(--ok)}
+.feedback.ko b{color:var(--ko)}
+.q-next{display:flex;justify-content:flex-end;margin-top:14px}
+.score{font-family:var(--serif);font-size:clamp(2.6rem,6vw + 1rem,3.6rem);font-weight:700;color:var(--c);line-height:1;margin:6px 0 4px}
+.center{text-align:center}
+.more-btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.92rem;color:var(--c-ink);min-height:44px}
+.more-btn .chev{width:8px;height:8px;border-color:var(--c-ink);margin:0 2px 3px}
+.review-item{border-top:1px solid var(--line);padding:12px 0;font-size:.93rem;text-align:left}
+.review-item .r-ok{color:var(--ok);font-weight:600}
+.review-item .r-ko{color:var(--ko);font-weight:600}
+
+/* ---------- Téléphones ---------- */
+@media (max-width:480px){
+  body{font-size:.97rem}
+  main{padding-top:20px}
+  .topbar .wrap{min-height:48px}
+  .tabs{top:48px}
+  .tabs{display:flex;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:1 0 auto;font-size:.8rem;min-height:46px;padding:10px 5px;overflow:visible;text-overflow:clip}
+  .tabs button::after{left:6px;right:6px}
+  .parts{grid-template-columns:1fr}
+  .part{padding:16px}
+  .acc-head{padding:14px 14px}
+  .acc-body{padding:0 14px 18px}
+  .fc-tools{justify-content:center}
+  .pills button{padding:6px 10px;font-size:.8rem}
+  .panel{padding:18px 16px}
+}
+/* ---------- Barre du haut : glossaire et réglages ---------- */
+.topbar .wrap{position:relative}
+.top-actions{margin-left:auto;display:flex;gap:6px;flex:0 0 auto}
+.tbtn{white-space:nowrap;flex:0 0 auto;min-height:36px;padding:6px 12px;border:1px solid var(--line-2);border-radius:8px;font-size:.86rem;font-weight:600;background:var(--surface);transition:border-color .2s}
+.tbtn.on{border-color:var(--ink)}
+@media (hover:hover){.tbtn:hover{border-color:var(--ink)}}
+.settings{position:absolute;right:clamp(16px,4vw,32px);top:calc(100% + 6px);width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:16px;box-shadow:0 14px 34px -14px rgba(0,0,0,.35);display:none;z-index:40}
+.settings.show{display:block;animation:appear .25s var(--ease)}
+.settings .set-label:first-child{margin-top:0}
+.settings .pills{display:flex}
+.settings .pills button{flex:1}
+.settings .note{font-size:.8rem;color:var(--muted);margin:10px 0 0;line-height:1.45}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* ---------- Réglages de lecture ---------- */
+/* Thèmes : papier (par défaut), clair, sombre */
+html.th-clair{--paper:#ffffff;--surface:#ffffff;--ink:#000000;--ink-2:#1a1a1a;--muted:#4d4d4d;--line:#e3e3e3;--line-2:#cdcdcd}
+html.th-sombre{color-scheme:dark;--paper:#16191c;--surface:#1f2327;--ink:#ebe8e2;--ink-2:#d3cfc7;--muted:#9ba1a7;--line:#2e3439;--line-2:#3d444b;--ok:#62c78f;--ok-soft:rgba(98,199,143,.14);--ko:#ef8472;--ko-soft:rgba(239,132,114,.15)}
+html.th-sombre .face.back,html.th-sombre .btn.solid,html.th-sombre .chips button.on{background:var(--c-deep,var(--c));border-color:var(--c-deep,var(--c))}
+html.th-sombre .btn.solid:hover{background:var(--c);border-color:var(--c)}
+html.th-sombre .tip,html.th-sombre .tip .arrow{background:#2e3439}
+html.th-sombre .tip{border:1px solid #454d54;color:#ebe8e2}
+html.th-sombre .part:hover,html.th-sombre .settings{box-shadow:0 14px 34px -14px rgba(0,0,0,.8)}
+.nav-btn{display:none}
+.nav-btn.show{display:inline-flex;align-items:center}
+.brand.hide{display:none}
+html.f-lex{--serif:'Lexend',system-ui,sans-serif;--sans:'Lexend',system-ui,sans-serif}
+html.f-lex .probl,html.f-lex .part .pq{font-style:normal}
+html.sp-wide body{letter-spacing:.03em;word-spacing:.12em}
+html.sp-wide .lesson p,html.sp-wide .aside p,html.sp-wide .recap p,html.sp-wide .summary,html.sp-wide .corr-item .ca,html.sp-wide .model,html.sp-wide .gl-item p{line-height:1.95}
+html.sp-wide .lesson p,html.sp-wide .aside p,html.sp-wide .recap p,html.sp-wide .summary,html.sp-wide .corr-item .ca,html.sp-wide .probl,html.sp-wide .part .pq,html.sp-wide .feedback,html.sp-wide .review-item .muted,html.sp-wide .model{text-align:left;-webkit-hyphens:manual;hyphens:manual}
+
+/* ---------- Glossaire ---------- */
+.gl-search{display:block;width:100%;font:inherit;font-size:1.05rem;padding:13px 16px;border:1.5px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--ink);margin:0 0 8px;-webkit-appearance:none;appearance:none}
+.gl-info{font-size:.86rem;color:var(--muted);margin:0 0 10px;min-height:1.3em}
+.gl-letter{font-family:var(--serif);font-weight:700;color:var(--ink-2);font-size:1.15rem;margin:22px 0 2px;padding-bottom:4px;border-bottom:1px solid var(--line-2)}
+.gl-item{padding:13px 0;border-bottom:1px solid var(--line)}
+.gl-item h3{margin:0 0 3px;font-size:1.08rem}
+.gl-item p{margin:0;font-family:var(--serif);line-height:1.6}
+.gl-tags{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+.gl-tags button{font-size:.78rem;font-weight:600;color:var(--c-ink);background:var(--c-soft);border-radius:6px;padding:3px 10px;min-height:30px}
+mark{background:var(--c-mid);color:inherit;border-radius:2px;padding:0 1px}
+
+/* ---------- Accueil ---------- */
+.extras{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
+.extras .revise{flex-wrap:nowrap}
+
+
+@media (max-width:520px){.crumbs{display:none}}
+
+/* ---------- Halloween (actif seulement si HALLOWEEN = true dans les réglages) ---------- */
+html.hw main{position:relative}
+html.hw .brand{white-space:nowrap}
+@media (max-width:420px){html.hw .brand{font-size:1rem}html.hw .brand .hw-p{margin-left:.25em}}
+html.hw main > .wrap{position:relative;z-index:1}
+.hw-web{position:absolute;top:0;width:clamp(70px,12vw,170px);height:clamp(70px,12vw,170px);color:var(--muted);opacity:.42;pointer-events:none;z-index:0}
+.hw-web.l{left:0}
+.hw-web.r{right:0;transform:scaleX(-1)}
+.hw-web svg{display:block;width:100%;height:100%}
+html.th-sombre .hw-web{opacity:.4}
+.hw-p{display:inline-block;width:1.15em;height:1.08em;vertical-align:-.14em;margin-left:.35em;line-height:0}
+.hw-p svg{display:block;width:100%;height:100%;overflow:visible}
+.hw-p .pf{fill:#3a2208;transition:fill .3s}
+.foot .hw-p{margin:0 .45em 0 0}
+html.hw .home-head{position:relative}
+.hw-big{position:absolute;right:0;top:2px;width:clamp(46px,9vw,68px);height:clamp(44px,8.5vw,64px);padding:0;margin:0;cursor:pointer;transition:transform .2s var(--ease)}
+.hw-big .hw-p{width:100%;height:100%;margin:0;vertical-align:0}
+@media (hover:hover){.hw-big:hover{transform:rotate(-6deg) scale(1.06)}}
+.hw-big:focus-visible{outline:2px solid #e2771a;outline-offset:4px;border-radius:12px}
+.hw-big.lit .pf{fill:#ffd84a}
+.hw-big.lit svg{filter:drop-shadow(0 0 10px rgba(255,170,40,.75))}
+.hw-big.lit{animation:hwWig .6s var(--ease)}
+@keyframes hwWig{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}55%{transform:rotate(9deg)}80%{transform:rotate(-4deg)}}
+.hw-rain{position:fixed;inset:0;z-index:70;overflow:hidden;pointer-events:none}
+.hw-rain .hw-p{position:absolute;top:0;margin:0;animation:hwFall linear forwards;will-change:transform}
+@keyframes hwFall{from{transform:translateY(-80px) rotate(0)}to{transform:translateY(calc(100vh + 80px)) rotate(var(--rot))}}
+@media (max-width:480px){html.hw .home-head h1{padding-right:56px}}
+
+/* ---------- Glossaire : tri par chapitre ---------- */
+.gl-filters{margin:4px 0 12px}
+.gl-filters .chips + .chips,.gl-chname + .chips{margin-top:8px}
+.gl-chname{margin:10px 0 0;font-size:.86rem;color:var(--muted)}
+.chips.small button{min-height:34px;padding:4px 12px;font-size:.82rem}
+
+/* ---------- Méthodes ---------- */
+.hl-v,.hl-e,.hl-b{color:inherit;border-radius:4px;padding:0 3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hl-v{background:rgba(250,214,40,.5)}
+.hl-e{background:rgba(110,205,95,.42)}
+.hl-b{background:rgba(96,165,250,.42)}
+.meth-card{background:#e3eefc;border-color:#a9c8ee;margin-bottom:30px}
+html.th-sombre .meth-card{background:rgba(80,150,240,.14);border-color:rgba(96,165,250,.45)}
+.meth-card h3 mark{font-weight:700}
+.part.nonum{grid-template-columns:1fr}
+.meth-card{cursor:pointer;transition:border-color .25s,transform .25s var(--ease),box-shadow .25s}
+.meth-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(30,80,150,.14)}
+.meth-card:active{transform:translateY(0)}
+.meth-card:focus-visible{outline:2px solid #3b82d6;outline-offset:2px}
+.m-steps{counter-reset:st;list-style:none;padding:0;margin:0 0 26px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.m-steps li{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 16px 56px}
+.m-steps li::before{counter-increment:st;content:counter(st);position:absolute;left:16px;top:16px;width:28px;height:28px;border-radius:8px;background:var(--c);color:#fff;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.m-steps h3{margin:2px 0 10px;font-size:1.08rem}
+.m-steps p{margin:0 0 10px;line-height:1.55;font-size:.95rem}
+.m-steps p:last-child{margin:0}
+.m-opt{font-size:.72rem;font-weight:600;color:var(--muted);border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;vertical-align:middle;margin-left:4px}
+.m-lab{display:block;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.m-ex{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:26px}
+.m-ex p{margin:0 0 14px;line-height:1.65}
+.m-ex>p:last-child{margin-bottom:0}
+.m-rep{border-left:3px solid var(--c);padding-left:16px}
+.m-rep p{font-family:var(--serif);margin:0 0 8px;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+.m-err{margin:0;padding-left:20px}
+.m-err li{margin:8px 0;line-height:1.55}
+
+/* ---------- Pied de page ---------- */
+.foot{border-top:1px solid var(--line);padding:18px 0 22px;padding-bottom:max(22px,env(safe-area-inset-bottom));text-align:center;font-size:.8rem;color:var(--muted)}
+
+/* ---------- Tuto ---------- */
+.tuto{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(20,30,22,.45)}
+.tuto.show{display:flex;animation:fade .25s var(--ease)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.tuto-box{position:relative;width:min(560px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;background:var(--surface);border-radius:16px;box-shadow:0 24px 60px -20px rgba(0,0,0,.5);overflow:hidden;animation:appear .35s var(--ease)}
+.tuto-box{min-height:min(510px,calc(100vh - 32px))}
+@media (max-width:560px){.tuto-box{min-height:min(640px,calc(100vh - 32px))}}
+.tuto-body{flex:1;padding:26px clamp(18px,5vw,30px) 8px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tuto-body h2{margin:0 0 12px;font-size:clamp(1.3rem,1.5vw + 1rem,1.6rem);line-height:1.25}
+.tuto-body p{margin:0 0 12px;line-height:1.6;color:var(--ink-2)}
+.tuto-body ul{margin:0 0 12px;padding-left:0;list-style:none}
+.tuto-body li{position:relative;padding-left:18px;margin:0 0 9px;line-height:1.55;color:var(--ink-2)}
+.tuto-body li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--c)}
+.tuto-body li b,.tuto-body p b{color:var(--ink)}
+.tuto-step{animation:appear .3s var(--ease)}
+.tuto-x{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:10px;font-size:1.4rem;line-height:1;color:var(--muted);z-index:1}
+@media (hover:hover){.tuto-x:hover{background:var(--paper);color:var(--ink)}}
+.tuto-demo{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
+.tuto-demo span{font-size:.8rem;font-weight:600;padding:5px 11px;border-radius:8px;background:var(--c-soft);color:var(--c-ink)}
+.tuto-demo .dterm{background:none;padding:0;border-radius:0;font-size:1rem;font-weight:400;font-family:var(--serif);color:var(--ink);border-bottom:1.5px dotted var(--c)}
+.tuto-foot{display:flex;align-items:center;gap:10px;padding:14px clamp(18px,5vw,30px) 18px;border-top:1px solid var(--line)}
+.tuto-dots{display:flex;gap:2px;flex:1;justify-content:center;flex-wrap:wrap}
+.tuto-dots button{width:22px;height:28px;display:flex;align-items:center;justify-content:center}
+.tuto-dots button::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background .2s,transform .2s}
+.tuto-dots button.on::before{background:var(--c);transform:scale(1.3)}
+.tuto-foot .btn{min-width:108px}
+.tuto-foot .btn.ghost{min-width:0;padding:10px 6px}
+@media (max-width:480px){.tuto-foot .btn{min-width:0}.tuto-dots button{width:16px}}
+@media (max-width:420px){.back-lbl{display:none}.tbtn{padding:6px 9px}.top-actions{gap:4px}}
+
+/* Texte justifié (avec césure pour éviter les grands espaces) */
+.lesson p,.aside p,.recap p,.summary,.corr-item .ca,.probl,.part .pq,.feedback,.review-item .muted{text-align:justify;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:break-word}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap"><button class="tbtn nav-btn" id="backBtn" aria-label="Retour">←<span class="back-lbl">&nbsp;Retour</span></button><button class="tbtn nav-btn" id="homeBtn">Accueil</button><button class="brand" id="brand">SVT · Secondes</button><nav class="crumbs" id="crumbs"></nav><div class="top-actions"><button class="tbtn" id="tutoBtn" aria-haspopup="dialog">Tuto</button><button class="tbtn" id="glBtn">Glossaire</button><button class="tbtn" id="setBtn" aria-label="Réglages du texte" aria-expanded="false">Aa</button></div><div class="settings" id="settings" role="dialog" aria-label="Réglages du texte"></div></div></div>
+<main><div class="wrap" id="app"></div></main>
+<footer class="foot"><div class="wrap">© Bruno Michalak – Tous droits réservés.</div></footer>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="tuto" id="tuto" role="dialog" aria-modal="true" aria-label="Tuto : comment utiliser le site"><div class="tuto-box"><button class="tuto-x" id="tutoX" aria-label="Fermer le tuto">×</button><div class="tuto-body" id="tutoBody"></div><div class="tuto-foot"><button class="btn ghost" id="tutoPrev">← Précédent</button><div class="tuto-dots" id="tutoDots"></div><button class="btn solid" id="tutoNext">Suivant →</button></div></div></div>
+
+<script>
+/* =====================================================================
+   RÉGLAGES
+   OUVRIR_SUR : null = accueil. "1a", "1b"… = ouvre directement la partie
+                (utile pour faire une page Google Sites par partie).
+   AFFICHER_CORRECTIONS : false pour masquer les corrections.
+   ===================================================================== */
+var OUVRIR_SUR = null;
+var AFFICHER_CORRECTIONS = true;
+/* HALLOWEEN : true = toiles et citrouilles affichées. Mettre false pour tout enlever. */
+var HALLOWEEN = true;
+
+/* Couleur de chaque chapitre : Chapitre 1 = 1re couleur, etc. */
+var COULEURS = ["#1f7a8c", "#bf5a2f", "#7a4fae", "#2f5fae", "#4f8a2f", "#a8435f"];
+
+/* =====================================================================
+   COMMENT ÉCRIRE LE CONTENU
+   Dans les textes de « L'essentiel » :
+     **mot**            → mot en gras
+     *texte*            → italique
+     [[terme]]          → terme souligné : définition au survol / au toucher
+     [[pluriel|terme]]  → affiche « pluriel », définition de « terme »
+   Les définitions viennent des flashcards + du GLOSSAIRE ci-dessous.
+
+   QCM : {q: "question", o: ["A","B","C","D"], r: index de la bonne
+          réponse (0 = A), e: "explication", n: niveau 1, 2 ou 3}
+          n = 1 facile · 2 moyen · 3 difficile
+   ===================================================================== */
+
+
+/* Définitions supplémentaires (termes qui ne sont pas dans les flashcards) */
+var GLOSSAIRE = {
+ "membrane plasmique": "Enveloppe qui délimite la cellule.",
+ "cytoplasme": "Contenu de la cellule, autour du noyau.",
+ "noyau": "Partie de la cellule qui contient l'ADN.",
+ "micromètre": "Unité de longueur (µm) : un millième de millimètre.",
+ "niveau d'organisation": "Échelle à laquelle on décrit le vivant : organisme, organe, tissu, cellule.",
+ "actine": "Protéine de la fibre musculaire qui participe à la contraction.",
+ "myosine": "Protéine de la fibre musculaire qui participe à la contraction.",
+ "corps cellulaire": "Partie du neurone qui contient le noyau.",
+ "dendrite": "Prolongement court et ramifié du neurone, qui reçoit des messages.",
+ "axone": "Long prolongement du neurone, qui transmet les messages.",
+ "cellule souche": "Cellule non spécialisée, capable de donner des cellules spécialisées.",
+ "adhérence": "Fait, pour des cellules voisines, de rester attachées entre elles.",
+ "épiderme": "Couche de cellules qui recouvre la surface d'un organe.",
+ "mutant": "Individu dont une partie de l'ADN est modifiée.",
+ "syndrome d'Ehlers-Danlos": "Maladie génétique rare qui touche le collagène : la peau est très extensible.",
+ "pancréas": "Organe de l'abdomen formé de cellules endocrines et de cellules exocrines.",
+ "îlot de Langerhans": "Petit amas de cellules endocrines dans le pancréas.",
+ "cellule endocrine": "Cellule qui libère ses substances dans le sang.",
+ "cellule exocrine": "Cellule qui libère ses substances hors du sang, par exemple vers l'intestin.",
+ "cellule β": "Cellule du pancréas qui fabrique l'insuline.",
+ "fluorescence": "Technique qui fait apparaître en couleur les molécules que l'on a marquées.",
+ "glycémie": "Quantité de glucose dans le sang.",
+ "amidon": "Grosse molécule de réserve des végétaux, présente dans le pain, les pâtes, le riz…",
+ "intestin grêle": "Partie du tube digestif où se termine la digestion.",
+ "Human Protein Atlas": "Programme scientifique qui localise les protéines dans les cellules humaines.",
+ "brins complémentaires": "Les deux brins de l'ADN : l'ordre de l'un impose l'ordre de l'autre.",
+ "cellule-œuf": "Cellule initiale dont proviennent toutes les cellules d'un organisme."
+};
+
+/* =====================================================================
+   CONTENU
+   ===================================================================== */
+var NIVEAUX = [
+{
+ id: "2nde",
+ nom: "Secondes",
+ intro: "Thème 1 – La Terre, la vie et l'organisation du vivant",
+ chapitres: [
+ {
+  num: 1,
+  titre: "L'organisme pluricellulaire, un ensemble de cellules spécialisées",
+  parties: [
+  /* ================================================================ 1a */
+  {
+   id: "1a",
+   titre: "Human Cell Atlas",
+   problematique: "Comment l'organisation d'une cellule est-elle liée à sa fonction ?",
+
+   activites: [
+    {
+     type: "Activité", titre: "L'atlas des cellules humaines (Human Cell Atlas)",
+     resume: "En binôme, chacun a étudié un dossier : l'élève A une fibre musculaire, l'élève B un neurone. Après avoir décrit sa cellule à l'aide des critères de réussite « Décrire un document scientifique », chacun l'a présentée à son camarade. On a ensuite comparé les deux cellules, puis exploité les données du programme Human Cell Atlas pour découvrir la diversité des cellules d'un même organe : le muscle ou le cerveau.",
+     correction: [
+      ["Décrire la cellule étudiée", "<b>Élève A – fibre musculaire :</b> le document 1 présente des observations d'une fibre musculaire humaine au microscope. La cellule est très allongée et présente de nombreuses stries. On observe plusieurs noyaux dans une même fibre. Les images en fluorescence montrent l'actine et la myosine, organisées dans la cellule. Grâce à l'échelle de 20 µm, la portion de fibre observée mesure de l'ordre d'une centaine de micromètres.<br><br><b>Élève B – neurone :</b> le document 1 présente un neurone pyramidal du cortex humain. Il possède un corps cellulaire d'où partent de nombreux prolongements très ramifiés, les dendrites. Un autre prolongement, l'axone, est beaucoup plus long et moins ramifié. La barre d'échelle représente 100 µm : le neurone s'étend donc sur plusieurs centaines de micromètres."],
+      ["Présenter sa cellule à son camarade", "Élève A : « J'ai étudié une fibre musculaire. C'est une cellule très allongée, striée, qui possède plusieurs noyaux et contient notamment de l'actine et de la myosine. »<br>Élève B : « J'ai étudié un neurone. Il possède un corps cellulaire avec de nombreux prolongements ramifiés, les dendrites, ainsi qu'un long axone. »"],
+      ["Comparer les deux cellules", "La fibre musculaire et le neurone ont des organisations très différentes. La fibre musculaire est très allongée, striée et contient plusieurs noyaux. Le neurone possède au contraire un corps cellulaire prolongé par de nombreuses dendrites et par un long axone."],
+      ["Les cellules présentes dans l'organe", "<b>Muscle :</b> le muscle ne contient pas uniquement des fibres musculaires. Parmi les 292 423 cellules ou noyaux analysés, les chercheurs ont identifié 15 populations principales : cellules musculaires, cellules souches, cellules vasculaires, immunitaires ou encore cellules de Schwann.<br><br><b>Cerveau :</b> le cerveau contient plusieurs types de cellules spécialisées, par exemple des astrocytes, des oligodendrocytes, des microgliocytes et des épendymocytes, qui ont des organisations et des fonctions différentes.<br><br>Un même organe contient donc plusieurs types de cellules spécialisées."],
+      ["Réponse à la problématique", "L'organisation d'une cellule est liée à sa fonction. La fibre musculaire possède une organisation particulière, avec notamment de l'actine et de la myosine, qui lui permet de se contracter et de produire une force. Le neurone possède de nombreux prolongements qui lui permettent de recevoir et de transmettre des messages. Ce sont donc deux cellules spécialisées, ayant chacune une organisation en lien avec leur fonction."]
+     ],
+     conclusionTitre: "Conclusion de l'activité",
+     conclusion: "La cellule musculaire et le neurone ont des organisations différentes en lien avec leur fonction. La cellule musculaire contient notamment de l'actine et de la myosine permettant la contraction, tandis que le neurone possède des prolongements adaptés à la réception et à la transmission de messages. Un même organe est ainsi constitué de plusieurs types de cellules spécialisées.",
+     lien: {texte: "Découvrir le Human Cell Atlas", url: "https://www.humancellatlas.org/"}
+    }
+   ],
+
+   essentiel: {
+    intro: {
+     chiffres: {titre: "Quelques chiffres", lignes: [
+      "Un corps humain adulte contient environ 30 000 milliards de cellules.",
+      "On y distingue plus de 400 grands types de cellules spécialisées.",
+      "Dans un seul muscle de la cuisse, les chercheurs du Human Cell Atlas ont analysé 292 423 cellules ou noyaux et identifié 15 populations principales de cellules."
+     ], source: "Sender & Milo, Nature Medicine, 2021 ; Hatton et al., PNAS, 2023 ; Lai et al., Nature, 2024."},
+     texte: [
+      "Tous les êtres vivants sont formés de cellules. **La [[cellule]] est la plus petite unité du vivant** : elle est délimitée par une [[membrane plasmique]], contient du [[cytoplasme]] et du matériel génétique, l'[[ADN]]. Certains êtres vivants ne sont formés que d'une seule cellule ; d'autres, comme l'être humain, en comptent des milliers de milliards. Lancé en 2016, le programme international **Human Cell Atlas** cherche à recenser tous les types de cellules du corps humain, à les localiser dans les tissus et à décrire leurs caractéristiques."
+     ]
+    },
+    sections: [
+     {titre: "Du vivant unicellulaire au vivant pluricellulaire", blocs: [
+      "Chez un **[[organisme unicellulaire]]**, comme une paramécie, une levure ou une bactérie, **une seule cellule assure l'ensemble des fonctions nécessaires à la vie** : se nourrir, se déplacer, se reproduire…",
+      "Chez un **[[organisme pluricellulaire]]**, comme l'être humain ou une plante, les cellules ne font pas toutes la même chose : elles sont **spécialisées**. Des cellules semblables ou complémentaires se regroupent en **[[tissus|tissu]]**, et plusieurs tissus différents forment un **[[organe]]**, qui assure une fonction particulière : le cœur, le muscle, le cerveau, une feuille… On décrit ainsi le vivant à plusieurs **[[niveaux d'organisation|niveau d'organisation]]**, emboîtés les uns dans les autres.",
+      {table: {legende: "L'échelle des niveaux d'organisation du vivant (ordres de grandeur)", entetes: ["Niveau", "Taille", "Exemple"],
+       lignes: [["Organisme", "1 m et +", "Un être humain, un arbre"], ["Organe", "1 cm à 1 m", "Le cœur, un muscle, une feuille"], ["Tissu", "1 mm à 1 cm", "Le tissu musculaire"], ["Cellule", "10 à 100 µm", "Une fibre musculaire, un neurone"]]}},
+      {aside: "Repère", texte: "Une cellule mesure en général quelques dizaines de [[micromètres|micromètre]] (µm) : un micromètre est un millionième de mètre. Par comparaison, un cheveu mesure environ 70 µm de diamètre. Les cellules ne sont donc visibles qu'au microscope."}
+     ]},
+     {titre: "Des cellules spécialisées : l'organisation liée à la fonction", blocs: [
+      "Chaque **[[cellule spécialisée]]** possède **une forme, des structures et certaines molécules particulières, en lien avec la fonction qu'elle assure**. Deux exemples étudiés dans l'activité le montrent.",
+      "La **[[fibre musculaire]]** est une cellule **très allongée et striée**, qui possède **plusieurs noyaux**. Elle contient en grande quantité deux [[protéines|protéine]] organisées en filaments, l'**[[actine]]** et la **[[myosine]]**, qui lui permettent de **se contracter et de produire une force**.",
+      "Le **[[neurone]]** possède un **[[corps cellulaire]]**, qui contient le noyau, d'où partent de nombreux prolongements très ramifiés, les **[[dendrites|dendrite]]**, et un prolongement beaucoup plus long, l'**[[axone]]**. Ces prolongements lui permettent de **recevoir et de transmettre des messages**, parfois sur de longues distances.",
+      {table: {legende: "Comparer deux cellules spécialisées", entetes: ["", "Fibre musculaire", "Neurone"],
+       lignes: [["Forme", "Très allongée, striée", "Corps cellulaire et nombreux prolongements"], ["Structures particulières", "Plusieurs noyaux ; filaments d'actine et de myosine", "Dendrites ramifiées ; long axone"], ["Fonction", "Se contracter, produire une force", "Recevoir et transmettre des messages"]]}},
+      {aside: "Méthode : décrire un document scientifique", texte: "Je présente la nature du document (photographie, graphique…). Je décris du général vers les détails importants (la forme, puis les éléments visibles). Je m'appuie sur des données précises (valeurs, échelle…). J'utilise un vocabulaire scientifique adapté (noyau, axone…)."}
+     ]},
+     {titre: "Un organe, plusieurs types de cellules spécialisées", blocs: [
+      "Un organe n'est pas formé d'un seul type de cellule. Dans un muscle de la cuisse, les chercheurs du Human Cell Atlas ont identifié **15 populations principales de cellules** : des fibres musculaires, mais aussi des [[cellules souches|cellule souche]], des cellules des vaisseaux sanguins, des cellules immunitaires ou encore des cellules qui entourent les nerfs. De même, le cerveau ne contient pas que des neurones : on y trouve aussi des astrocytes, des oligodendrocytes, des cellules microgliales…",
+      "**Plusieurs types de cellules spécialisées sont donc présents et coopèrent dans un même organe** : c'est l'ensemble de leurs activités qui permet à l'organe d'assurer sa fonction."
+     ]}
+    ],
+    /* « En résumé » = les bilans du cahier, mot pour mot */
+    recap: [
+     {titre: "Bilan 1.a)", texte: "Chez un organisme pluricellulaire, les organes sont constitués de tissus formés de cellules spécialisées."},
+     {texte: "Ces cellules possèdent une forme, des structures et certaines molécules particulières en lien avec la fonction qu'elles assurent. Plusieurs types de cellules spécialisées peuvent ainsi être présents et coopérer dans un même organe."},
+     {texte: "Chez un organisme unicellulaire, une seule cellule assure l'ensemble des fonctions nécessaires à la vie."}
+    ]
+   },
+
+   flashcards: [
+    ["Cellule", "Plus petite unité du vivant, capable de fonctionner de manière autonome."],
+    ["Organisme unicellulaire", "Être vivant formé d'une seule cellule, qui assure toutes les fonctions."],
+    ["Organisme pluricellulaire", "Être vivant formé de nombreuses cellules spécialisées."],
+    ["Tissu", "Ensemble de cellules organisées qui assurent une même fonction."],
+    ["Organe", "Partie d'un organisme formée de plusieurs tissus, qui assure une fonction (ex. cœur, feuille)."],
+    ["Cellule spécialisée", "Cellule dont la forme, les structures et les molécules sont liées à sa fonction."],
+    ["Fibre musculaire", "Cellule du muscle, allongée et striée, capable de se contracter."],
+    ["Neurone", "Cellule nerveuse qui reçoit et transmet des messages."]
+   ],
+
+   qcm: [
+    {n: 1, q: "Lequel de ces éléments correspond au niveau d'organisation le plus petit ?", o: ["Le tissu musculaire", "La fibre musculaire", "Le muscle de la cuisse", "L'être humain"], r: 1, e: "La fibre musculaire est une cellule : c'est le plus petit de ces quatre niveaux."},
+    {n: 1, q: "Un organisme unicellulaire se distingue d'un organisme pluricellulaire parce que :", o: ["ses cellules sont toutes identiques et non spécialisées", "son unique cellule assure toutes les fonctions vitales", "ses organes sont formés d'un seul type de tissu", "sa cellule ne contient pas de matériel génétique"], r: 1, e: "Il n'a qu'une cellule : pas de tissu, pas d'organe, et cette cellule fait tout."},
+    {n: 1, q: "Un tissu correspond à :", o: ["un ensemble de cellules organisées pour une même fonction", "un ensemble d'organes qui assurent ensemble une même fonction", "une cellule de grande taille qui assure plusieurs fonctions", "un ensemble de molécules situées à l'intérieur d'une cellule"], r: 0, e: "Exemple : le tissu musculaire, formé de fibres musculaires."},
+    {n: 1, q: "Le cœur est un organe car il est constitué :", o: ["de plusieurs tissus différents qui assurent une fonction", "d'un seul tissu formé de cellules identiques entre elles", "de cellules toutes capables de vivre de manière autonome", "de plusieurs organismes qui coopèrent entre eux"], r: 0, e: "Un organe réunit plusieurs tissus différents et assure une fonction particulière."},
+    {n: 1, q: "Quel classement va du plus grand au plus petit ?", o: ["Organe – organisme – tissu – cellule", "Organisme – organe – tissu – cellule", "Organisme – tissu – organe – cellule", "Organe – tissu – organisme – cellule"], r: 1, e: "Chaque niveau est formé d'éléments du niveau inférieur."},
+    {n: 1, q: "Dans une fibre musculaire, l'actine et la myosine permettent :", o: ["la contraction de la cellule", "la réception des messages nerveux", "la division de la cellule", "le stockage de l'ADN"], r: 0, e: "Ces deux protéines, organisées en filaments, permettent la contraction."},
+    {n: 1, q: "Dans un neurone, le noyau se trouve dans :", o: ["l'axone", "les dendrites", "le corps cellulaire", "les ramifications"], r: 2, e: "Les dendrites et l'axone partent du corps cellulaire, qui contient le noyau."},
+    {n: 1, q: "Un micromètre (µm) correspond à :", o: ["un millième de mètre", "un millième de millimètre", "un millionième de millimètre", "un centième de millimètre"], r: 1, e: "1 µm = 0,001 mm, soit un millionième de mètre."},
+    {n: 2, q: "Au microscope, on observe une cellule très allongée, striée, avec plusieurs noyaux. Il s'agit probablement :", o: ["d'un neurone du cerveau", "d'une fibre musculaire", "d'une cellule d'épiderme", "d'un organisme unicellulaire"], r: 1, e: "Allongée, striée, plusieurs noyaux : ce sont les caractéristiques de la fibre musculaire."},
+    {n: 2, q: "Quelle association « structure : rôle » est correcte pour le neurone ?", o: ["Dendrites : recevoir des messages", "Axone : contenir le noyau", "Corps cellulaire : se contracter", "Dendrites : produire une force"], r: 0, e: "Les dendrites reçoivent les messages, l'axone les transmet."},
+    {n: 2, q: "Par rapport aux dendrites, l'axone d'un neurone est :", o: ["plus court et plus ramifié", "plus long et moins ramifié", "plus court et moins ramifié", "plus long et plus ramifié"], r: 1, e: "L'axone est un prolongement unique, long et peu ramifié."},
+    {n: 2, q: "Dans le muscle, le Human Cell Atlas a identifié 15 populations principales de cellules. Cela montre que :", o: ["un organe contient plusieurs types de cellules spécialisées", "une fibre musculaire contient quinze noyaux différents", "le muscle est formé de quinze tissus ayant la même fonction", "chaque fibre musculaire assure quinze fonctions différentes"], r: 0, e: "Fibres musculaires, cellules souches, vasculaires, immunitaires… coopèrent dans le muscle."},
+    {n: 2, q: "La barre d'échelle représente 20 µm. Une portion de fibre mesure 5 fois cette barre, soit :", o: ["4 µm", "25 µm", "100 µm", "1 000 µm"], r: 2, e: "5 × 20 µm = 100 µm."},
+    {n: 2, q: "« D'après l'échelle, la portion de fibre visible mesure environ 100 µm. » Quel critère de réussite cette phrase respecte-t-elle ?", o: ["Présenter la nature du document", "S'appuyer sur des données précises", "Décrire du général vers le détail", "Répondre à la problématique"], r: 1, e: "Elle cite une valeur tirée de l'échelle du document."},
+    {n: 2, q: "Une levure est un organisme unicellulaire. On peut donc affirmer que :", o: ["elle ne possède ni tissu ni organe", "ses cellules sont regroupées en tissus", "elle ne réalise aucune fonction vitale", "ses cellules sont toutes spécialisées"], r: 0, e: "Une seule cellule : il ne peut y avoir ni tissu ni organe."},
+    {n: 2, q: "Le cerveau contient des neurones, des astrocytes, des oligodendrocytes… Ces cellules ont :", o: ["la même organisation mais des fonctions différentes", "des organisations et des fonctions différentes", "des organisations différentes mais la même fonction", "la même organisation et la même fonction"], r: 1, e: "Ce sont des cellules spécialisées différentes : organisation et fonction vont ensemble."},
+    {n: 3, q: "Un spermatozoïde possède un long flagelle mobile. En appliquant l'idée du cours, on peut proposer que :", o: ["cette structure est liée à sa fonction : se déplacer", "cette structure n'a aucun lien avec sa fonction", "toutes les cellules du corps possèdent un flagelle", "ce flagelle en fait un organisme unicellulaire"], r: 0, e: "Comme pour la fibre musculaire et le neurone, l'organisation est liée à la fonction."},
+    {n: 3, q: "Un élève écrit : « Le muscle est un tissu car il ne contient que des fibres musculaires. » Quelle est son erreur ?", o: ["Le muscle est un organe : il contient divers types de cellules", "Le muscle est une seule cellule : il possède de nombreux noyaux", "Le muscle est un organisme : il fonctionne de manière autonome", "Il n'y a pas d'erreur : le muscle ne contient que des fibres"], r: 0, e: "Le muscle contient aussi des cellules souches, vasculaires, immunitaires…"},
+    {n: 3, q: "Une cellule mesure 50 µm. Combien faut-il en aligner pour obtenir 1 mm ?", o: ["2", "20", "200", "2 000"], r: 1, e: "1 mm = 1 000 µm, et 1 000 ÷ 50 = 20."},
+    {n: 3, q: "Quel argument montre le mieux que l'organisation du neurone est liée à sa fonction ?", o: ["Il possède un noyau contenant de l'ADN, comme les autres cellules", "Ses prolongements le relient à d'autres cellules, parfois éloignées", "Il mesure plusieurs centaines de micromètres d'après l'échelle", "Il a été observé au microscope dans le cortex humain"], r: 1, e: "Seule cette réponse relie une structure (les prolongements) à la fonction (recevoir et transmettre des messages)."},
+    {n: 3, q: "Si une fibre musculaire ne fabriquait plus de myosine, la conséquence la plus probable serait :", o: ["elle ne pourrait plus se contracter", "elle se transformerait en neurone", "elle perdrait tous ses noyaux", "elle ne contiendrait plus d'ADN"], r: 0, e: "La contraction repose sur l'actine et la myosine."},
+    {n: 3, q: "Un globule rouge est un petit disque souple, sans noyau, rempli d'hémoglobine qui fixe le dioxygène. Quelle conclusion est la mieux justifiée ?", o: ["Sa forme et ses molécules sont liées à sa fonction", "Sans noyau, ce n'est pas une vraie cellule spécialisée", "Sa petite taille montre qu'il est un être unicellulaire", "L'hémoglobine lui permet de se contracter comme un muscle"], r: 0, e: "Forme, structures et molécules particulières en lien avec la fonction : c'est une cellule spécialisée."}
+   ]
+  },
+  /* ================================================================ 1b */
+  {
+   id: "1b",
+   titre: "La cohésion des cellules dans les tissus",
+   problematique: "Comment est assurée la cohésion entre les tissus ?",
+
+   activites: [
+    {
+     type: "TP", titre: "Cohésion des cellules dans les tissus végétaux",
+     resume: "On a réalisé deux préparations microscopiques : un épiderme d'oignon rouge et une très fine couche de chair de pomme, observées en suivant les critères de réussite « Observation au microscope ». On a comparé l'organisation des cellules dans ces deux tissus, puis exploité des documents de recherche sur des plantes dont la production de certaines pectines est perturbée.",
+     correction: [
+      ["Observer l'organisation des cellules", "Dans l'épiderme d'oignon rouge, les cellules sont généralement allongées, régulières et très jointives. Elles sont organisées en une couche continue.<br>Dans la chair de pomme, les cellules sont plus arrondies ou irrégulières et leur disposition est moins régulière. Des espaces peuvent être visibles entre certaines cellules."],
+      ["Comparer les deux tissus", "Les deux tissus sont constitués de cellules organisées différemment. Dans l'épiderme d'oignon, les cellules sont très serrées et régulièrement disposées, tandis que dans la chair de pomme elles sont moins régulièrement organisées et peuvent être séparées par des espaces."],
+      ["Déduire le rôle des pectines", "Le document 1 montre que, lorsque la production de certaines pectines est perturbée, des espaces apparaissent entre les cellules, alors que les cellules normales restent jointives. Le document 2 montre que les pectines sont particulièrement présentes dans la lamelle moyenne, située entre deux cellules voisines. Les pectines participent donc à l'adhérence entre les cellules et à la cohésion du tissu."],
+      ["Réponse à la problématique", "La cohésion des cellules d'un tissu végétal est notamment assurée par leur matrice extracellulaire, constituée par les parois et la lamelle moyenne. Cette dernière, riche en pectines, participe à l'adhérence entre les cellules voisines et permet ainsi de maintenir la cohésion du tissu."]
+     ],
+     conclusionTitre: "Conclusion du TP",
+     conclusion: "L'observation de l'oignon rouge et de la pomme montre que les cellules peuvent être organisées différemment selon les tissus. Les documents indiquent que les pectines, présentes notamment dans la lamelle moyenne entre deux cellules végétales, participent à leur adhérence. Lorsque leur production est perturbée, les cellules se séparent plus facilement."
+    },
+    {
+     type: "Devoir", titre: "Les matrices extracellulaires",
+     resume: "À partir de documents sur la matrice extracellulaire des animaux (riche en collagène) et sur celle des végétaux (la paroi, riche en cellulose), on a comparé ces deux matrices, puis étudié le syndrome d'Ehlers-Danlos, une maladie génétique rare qui touche le collagène.",
+     correction: [
+      ["Comparer les deux matrices extracellulaires", "Point commun : chez les animaux comme chez les végétaux, la matrice extracellulaire est constituée de molécules situées autour des cellules et participe à leur cohésion. Différence : la matrice animale contient notamment du collagène, tandis que la matrice végétale correspond à la paroi et contient notamment de la cellulose."],
+      ["Ce qui maintient les cellules associées", "Dans les tissus animaux, les cellules sont ancrées, grâce à des protéines de leur membrane, à un réseau de molécules de la matrice extracellulaire. Dans les tissus végétaux, la paroi, et notamment la lamelle moyenne, permet de maintenir les cellules voisines associées."],
+      ["Le syndrome d'Ehlers-Danlos", "Chez l'individu sain, les fibres de collagène sont régulièrement organisées, alors qu'elles sont plus irrégulières chez l'individu atteint. Cette modification est associée à une peau très extensible et à des articulations très mobiles. La matrice extracellulaire participe donc à la cohésion et aux propriétés mécaniques des tissus."]
+     ]
+    }
+   ],
+
+   essentiel: {
+    sections: [
+     {titre: "Des tissus aux organisations différentes", blocs: [
+      "Dans un organisme pluricellulaire, les cellules d'un même tissu restent associées les unes aux autres : c'est la **[[cohésion]]** du tissu. Pourtant, **l'organisation et l'espacement des cellules peuvent varier selon les tissus**.",
+      "Au microscope, dans l'**[[épiderme]] d'oignon rouge**, les cellules sont allongées, régulières et **très jointives** : elles forment une couche continue. Dans la **chair de pomme**, les cellules sont plus arrondies, disposées de façon moins régulière, et **des espaces apparaissent entre certaines d'entre elles**.",
+      {table: {legende: "Comparer les deux tissus observés au microscope", entetes: ["", "Épiderme d'oignon rouge", "Chair de pomme"],
+       lignes: [["Forme des cellules", "Allongées, régulières", "Arrondies ou irrégulières"], ["Disposition", "Couche continue, régulière", "Moins régulière"], ["Espaces entre les cellules", "Aucun : cellules très jointives", "Espaces visibles entre certaines cellules"]]}},
+      {aside: "Méthode : observer au microscope", texte: "Ma préparation est fine et propre, sans pli ni grosse bulle. Je commence au faible grossissement (×40 puis ×100). Je centre une zone intéressante et je fais une mise au point nette. J'augmente progressivement le grossissement, sans dépasser le grossissement maximal sans l'accord du professeur."}
+     ]},
+     {titre: "La matrice extracellulaire, un « ciment » entre les cellules", blocs: [
+      "Ce qui maintient les cellules associées ne se trouve pas dans les cellules, mais **autour d'elles**. Dans un tissu, les cellules sont associées grâce à une **[[matrice extracellulaire]]** : un ensemble de **molécules situées à l'extérieur des cellules**, qui participe à leur **[[adhérence]]** et donc à la cohésion du tissu.",
+      "**Chez les végétaux, cette matrice extracellulaire constitue la [[paroi]]**, qui entoure chaque cellule. Entre les parois de deux cellules voisines se trouve une fine couche, la **[[lamelle moyenne]]**, particulièrement riche en **[[pectines|pectine]]** : elle joue le rôle d'un « ciment » qui maintient les cellules collées entre elles."
+     ]},
+     {titre: "Le rôle des pectines démontré par des plantes mutantes", blocs: [
+      "Pour montrer le rôle des pectines, des chercheurs ont comparé des plantes normales à des plantes **[[mutantes|mutant]]** dont la production de certaines pectines est perturbée. Chez les plantes normales, les cellules voisines restent jointives. **Chez les mutants, des espaces apparaissent entre certaines cellules** : elles se séparent plus facilement.",
+      "Comme les pectines sont concentrées dans la lamelle moyenne, entre deux cellules voisines, on en déduit que **les pectines participent à l'adhérence entre les cellules et à la cohésion du tissu**.",
+      {aside: "Raisonnement", texte: "On compare deux situations qui ne diffèrent que par un seul facteur : ici, la production de pectines. Si le résultat change (les cellules se séparent), c'est que ce facteur joue un rôle. Les plantes normales servent de **témoin**."}
+     ]},
+     {titre: "Chez les animaux aussi, une matrice extracellulaire", blocs: [
+      "Les cellules animales n'ont pas de paroi, mais elles possèdent elles aussi une matrice extracellulaire. Elle est formée surtout de longues **fibres de [[collagène]]**, reliées par un réseau de molécules qui occupe l'espace entre les cellules. Des protéines de la membrane permettent aux cellules de **s'ancrer** à ce réseau.",
+      {table: {legende: "Comparer les matrices extracellulaires animale et végétale", entetes: ["", "Animaux", "Végétaux"],
+       lignes: [["Nom", "Matrice extracellulaire", "Paroi (et lamelle moyenne)"], ["Molécule principale", "Collagène", "Cellulose (et pectines)"], ["Rôle", "Cohésion, résistance et élasticité des tissus", "Cohésion, soutien et protection des tissus"]]}},
+      "Dans le **[[syndrome d'Ehlers-Danlos]]**, une maladie génétique rare, les fibres de collagène sont irrégulières : la peau est anormalement extensible et les articulations très mobiles. La matrice extracellulaire participe donc aussi aux **propriétés mécaniques** des tissus."
+     ]}
+    ],
+    /* « En résumé » = les bilans du cahier, mot pour mot */
+    recap: [
+     {titre: "Bilan 1.b)", texte: "Dans un tissu, les cellules sont associées grâce à une matrice extracellulaire, constituée de molécules situées à l'extérieur des cellules. Elle participe notamment à leur adhérence et donc à la cohésion du tissu."},
+     {texte: "Chez les végétaux, cette matrice extracellulaire constitue la paroi. Entre deux cellules voisines, la lamelle moyenne, riche notamment en pectines, contribue à maintenir les cellules associées."},
+     {texte: "L'organisation et l'espacement des cellules peuvent varier selon les tissus, comme observé entre l'épiderme d'oignon et la chair de pomme."}
+    ]
+   },
+
+   flashcards: [
+    ["Cohésion", "Fait que les cellules d'un tissu restent associées entre elles."],
+    ["Matrice extracellulaire", "Ensemble de molécules situées à l'extérieur des cellules, qui assure la cohésion du tissu."],
+    ["Paroi", "Matrice extracellulaire des cellules végétales, qui entoure chaque cellule."],
+    ["Lamelle moyenne", "Couche riche en pectines, située entre deux cellules végétales voisines."],
+    ["Pectine", "Molécule de la lamelle moyenne qui fait adhérer les cellules végétales entre elles."],
+    ["Collagène", "Protéine en fibres de la matrice extracellulaire des animaux."]
+   ],
+
+   qcm: [
+    {n: 1, q: "La matrice extracellulaire se trouve :", o: ["dans le cytoplasme des cellules", "à l'extérieur des cellules", "dans le noyau des cellules", "dans la membrane des cellules"], r: 1, e: "Extra-cellulaire : à l'extérieur des cellules."},
+    {n: 1, q: "Chez les végétaux, la matrice extracellulaire constitue :", o: ["la membrane plasmique", "la paroi", "le cytoplasme", "le noyau"], r: 1, e: "La paroi entoure chaque cellule végétale, à l'extérieur de sa membrane."},
+    {n: 1, q: "La lamelle moyenne est située :", o: ["entre le noyau et le cytoplasme d'une cellule", "entre les parois de deux cellules voisines", "entre la membrane et le cytoplasme d'une cellule", "entre deux tissus différents d'un même organe"], r: 1, e: "Elle se trouve à l'interface entre deux cellules végétales voisines."},
+    {n: 1, q: "Les pectines sont particulièrement abondantes dans :", o: ["le cytoplasme", "la lamelle moyenne", "le noyau", "la membrane plasmique"], r: 1, e: "C'est ce qui fait de la lamelle moyenne un « ciment » entre les cellules."},
+    {n: 1, q: "Au microscope, on commence toujours l'observation :", o: ["au plus fort grossissement", "au plus faible grossissement", "au grossissement intermédiaire", "au grossissement maximal autorisé"], r: 1, e: "On repère et on centre la zone, puis on augmente progressivement."},
+    {n: 1, q: "La matrice extracellulaire des animaux est surtout formée de fibres de :", o: ["cellulose", "pectine", "collagène", "myosine"], r: 2, e: "Cellulose et pectines appartiennent à la paroi végétale ; la myosine est dans la fibre musculaire."},
+    {n: 2, q: "Un tissu végétal montre des cellules allongées, régulières, sans espace entre elles. Il s'agit plutôt :", o: ["de la chair de pomme", "de l'épiderme d'oignon", "d'un tissu de plante mutante", "d'un tissu riche en espaces"], r: 1, e: "L'épiderme d'oignon forme une couche continue de cellules très jointives."},
+    {n: 2, q: "Comparée à l'épiderme d'oignon, la chair de pomme présente des cellules :", o: ["plus allongées et plus jointives", "plus arrondies et moins jointives", "plus allongées et moins jointives", "plus arrondies et plus jointives"], r: 1, e: "Arrondies, moins régulières, avec des espaces entre certaines d'entre elles."},
+    {n: 2, q: "Chez les plantes mutantes qui produisent moins de certaines pectines, on observe que :", o: ["les parois des cellules disparaissent totalement", "des espaces apparaissent entre les cellules", "les cellules deviennent plus petites", "les cellules changent de forme"], r: 1, e: "Les cellules voisines adhèrent moins bien et se séparent."},
+    {n: 2, q: "Dans cette expérience, les plantes normales servent :", o: ["de témoin, pour comparer", "de mutant, pour tester", "d'hypothèse à vérifier", "de conclusion à l'étude"], r: 0, e: "Le témoin montre ce qui se passe quand les pectines sont produites normalement."},
+    {n: 2, q: "Pourquoi comparer plantes normales et plantes mutantes permet-il de conclure sur le rôle des pectines ?", o: ["Car un seul facteur change : la production de pectines", "Car les deux plantes appartiennent à des espèces différentes", "Car les plantes mutantes n'ont plus aucune paroi", "Car les plantes normales n'ont pas de pectines"], r: 0, e: "Si un seul facteur change, la différence observée lui est due."},
+    {n: 2, q: "Une préparation microscopique trop épaisse pose problème car :", o: ["les cellules se superposent et l'image est illisible", "les cellules se colorent et changent de forme", "le grossissement du microscope devient plus faible", "la lamelle moyenne des cellules est détruite"], r: 0, e: "La lumière doit traverser une couche très fine de cellules."},
+    {n: 2, q: "Quelle différence existe entre les matrices extracellulaires animale et végétale ?", o: ["L'une est dans les cellules, l'autre à l'extérieur", "L'une contient surtout du collagène, l'autre de la cellulose", "L'une assure la cohésion du tissu, l'autre sépare les cellules", "L'une existe dans les tissus, l'autre dans les organes"], r: 1, e: "Les deux sont à l'extérieur des cellules et participent à la cohésion ; leur composition diffère."},
+    {n: 2, q: "Dans un tissu animal, les cellules restent associées car :", o: ["elles sont entourées d'une paroi rigide riche en pectines", "elles sont ancrées à un réseau de molécules extérieures", "elles partagent un seul et même cytoplasme", "elles sont reliées entre elles par leurs noyaux"], r: 1, e: "Des protéines de leur membrane les ancrent à la matrice extracellulaire."},
+    {n: 2, q: "Quel énoncé sur l'organisation des tissus est exact ?", o: ["L'espacement des cellules varie selon les tissus", "Les cellules sont toujours jointives dans un tissu", "Les cellules ne sont jamais jointives dans un tissu", "L'espacement dépend seulement de la taille des cellules"], r: 0, e: "C'est ce que montre la comparaison entre l'oignon et la pomme."},
+    {n: 3, q: "En cuisine, la pectine sert à gélifier les confitures. Quel lien avec son rôle dans la plante ?", o: ["Elle forme un réseau qui lie les éléments entre eux", "Elle donne leur couleur aux cellules du fruit", "Elle fournit de l'énergie aux cellules du fruit", "Elle permet aux cellules du fruit de se contracter"], r: 0, e: "Dans la lamelle moyenne comme dans la confiture, les pectines forment un réseau qui « colle »."},
+    {n: 3, q: "Un fruit très mûr devient mou. Quelle hypothèse est la plus cohérente avec le cours ?", o: ["Ses pectines sont dégradées : les cellules adhèrent moins", "Ses pectines sont plus nombreuses : les cellules se resserrent", "Ses cellules perdent leur noyau en mûrissant", "Ses parois s'épaississent et deviennent rigides"], r: 0, e: "Moins de pectines dans la lamelle moyenne : moins d'adhérence, donc un tissu moins cohérent."},
+    {n: 3, q: "On applique sur un épiderme d'oignon une enzyme qui détruit les pectines. On s'attend à ce que :", o: ["les cellules se séparent plus facilement", "les cellules deviennent plus jointives", "les cellules perdent leur membrane", "les cellules s'arrondissent sans se séparer"], r: 0, e: "Comme chez les mutants : sans pectines, l'adhérence entre cellules diminue."},
+    {n: 3, q: "Dans le syndrome d'Ehlers-Danlos, les fibres de collagène sont irrégulières et la peau très extensible. On en déduit que la matrice extracellulaire :", o: ["participe aux propriétés mécaniques des tissus", "n'a de rôle que dans les tissus végétaux", "empêche les cellules de la peau de se diviser", "se trouve à l'intérieur des cellules de la peau"], r: 0, e: "Une matrice anormale modifie la résistance et l'élasticité du tissu."},
+    {n: 3, q: "Un élève écrit : « Les cellules végétales sont collées par leur membrane plasmique. » Comment corriger ?", o: ["Elles sont associées par la lamelle moyenne, entre leurs parois", "Elles sont associées par leur noyau, au centre du tissu", "Elles sont associées par le cytoplasme qu'elles partagent toutes", "Elles sont associées par leur paroi, sans aucune lamelle moyenne"], r: 0, e: "Les membranes ne se touchent pas : chaque cellule a sa paroi, et la lamelle moyenne relie les parois."},
+    {n: 3, q: "Pour être sûr que la séparation des cellules est bien due aux pectines, plantes normales et mutantes doivent :", o: ["être cultivées dans les mêmes conditions", "être cultivées dans des conditions différentes", "appartenir à deux espèces différentes", "être observées à des âges différents"], r: 0, e: "Un seul facteur doit varier : tout le reste doit être identique."},
+    {n: 3, q: "Des cellules de pomme se séparent facilement quand on écrase la chair, celles d'oignon beaucoup moins. Quelle observation du TP est cohérente avec cela ?", o: ["Les cellules de pomme sont séparées par des espaces", "Les cellules de pomme sont plus allongées et plus régulières", "Les cellules d'oignon n'ont pas de paroi", "Les cellules d'oignon sont plus arrondies"], r: 0, e: "Dans la chair de pomme, les cellules sont moins jointives : la cohésion du tissu est plus faible."}
+   ]
+  },
+  /* ================================================================ 1c */
+  {
+   id: "1c",
+   titre: "Des cellules spécialisées aux caractéristiques différentes",
+   problematique: "En quoi les cellules spécialisées sont-elles différentes ?",
+
+   activites: [
+    {
+     type: "Activité", titre: "Comparaison de cellules spécialisées",
+     resume: "À partir de coupes de pancréas humain issues du Human Protein Atlas, on a repéré dans quelles cellules sont détectées deux substances : l'insuline, grâce à une coloration brune et à une photographie de fluorescence d'un îlot de Langerhans, et l'amylase, par les mêmes techniques. On a comparé ces résultats dans un tableau, puis expliqué en quoi ces deux types de cellules sont spécialisés.",
+     correction: [
+      ["Localiser l'insuline et l'amylase", "Les documents associent des photographies microscopiques de pancréas humain et des données de détection obtenues après coloration.<br>Dans le document 1, l'insuline est détectée dans les cellules endocrines du pancréas, plus précisément dans les cellules β des îlots de Langerhans. La détection y est élevée, d'intensité forte, et concerne plus de 75 % des cellules endocrines. Elle n'est pas détectée dans les cellules glandulaires exocrines.<br>Dans le document 2, l'amylase est au contraire fortement détectée dans les cellules glandulaires exocrines : la détection est élevée et concerne plus de 75 % des cellules exocrines. Elle n'est pas détectée dans les cellules endocrines. La fluorescence verte confirme sa présence dans des groupes de cellules exocrines."],
+      ["Comparer les résultats dans un tableau", "<b>Insuline :</b> détection élevée dans les cellules β, endocrines (&gt; 75 %) ; non détectée dans les cellules exocrines.<br><b>Amylase :</b> non détectée dans les cellules endocrines ; détection élevée dans les cellules exocrines (&gt; 75 %).<br>Point commun : chaque substance est fortement détectée dans un type cellulaire. Différence : leur répartition est inverse entre les cellules endocrines et exocrines."],
+      ["Expliquer la spécialisation des deux types de cellules", "Les cellules β sont spécialisées dans la libération d'insuline dans le sang, ce qui participe à la régulation de la glycémie. Les cellules exocrines sont spécialisées dans la libération d'amylase vers l'intestin grêle, où elle participe à la digestion de l'amidon. Chaque type cellulaire libère donc une substance particulière en lien avec sa fonction."],
+      ["Réponse généralisée à la problématique", "Dans un organisme pluricellulaire, les cellules spécialisées ne fabriquent pas toutes les mêmes molécules. Chaque type possède un équipement moléculaire particulier, en relation avec la fonction qu'il assure dans un tissu ou un organe."]
+     ],
+     conclusionTitre: "Conclusion de l'activité",
+     conclusion: "Dans le pancréas, l'insuline est détectée dans les cellules β des îlots de Langerhans, tandis que l'amylase est détectée dans les cellules exocrines. Ces deux types de cellules spécialisées possèdent donc des équipements moléculaires différents. Les molécules qu'elles fabriquent sont en lien avec leurs fonctions : l'insuline participe à la régulation de la glycémie, alors que l'amylase participe à la digestion de l'amidon.",
+     lien: {texte: "Explorer le Human Protein Atlas", url: "https://www.proteinatlas.org/"}
+    }
+   ],
+
+   essentiel: {
+    sections: [
+     {titre: "Le pancréas, un organe aux cellules différentes", blocs: [
+      "En 1.a), on a vu que les cellules spécialisées diffèrent par leur forme et leurs structures. **La spécialisation cellulaire ne concerne pas seulement la forme et l'organisation des cellules** : elle se voit aussi à l'échelle des **molécules**. Le **[[pancréas]]**, un organe situé dans l'abdomen, en donne un bon exemple.",
+      "Le pancréas contient deux grands types de cellules. Regroupées en petits amas, les **[[îlots de Langerhans|îlot de Langerhans]]**, les **[[cellules endocrines|cellule endocrine]]** libèrent des substances dans le **sang**. Tout autour, les **[[cellules exocrines|cellule exocrine]]**, beaucoup plus nombreuses, libèrent des substances vers l'**[[intestin grêle]]**.",
+      {aside: "Comment repère-t-on une molécule dans une cellule ?", texte: "On traite une coupe d'organe avec une technique de marquage qui se fixe uniquement sur la molécule recherchée. Les cellules qui la contiennent apparaissent alors colorées en brun au microscope optique, ou en couleur sur fond noir en [[fluorescence]]. Les images étudiées proviennent du [[Human Protein Atlas]], qui cartographie ainsi les protéines du corps humain."}
+     ]},
+     {titre: "Insuline et amylase : chaque cellule fabrique ses propres molécules", blocs: [
+      "L'**[[insuline]]** est détectée **dans les [[cellules β|cellule β]] des îlots de Langerhans**, dans plus de 75 % des cellules endocrines, mais **pas dans les cellules exocrines**. Les cellules β libèrent l'insuline dans le sang : elle participe à la régulation de la **[[glycémie]]**, c'est-à-dire de la quantité de glucose dans le sang.",
+      "L'**[[amylase]]** est au contraire détectée **dans les cellules exocrines**, dans plus de 75 % d'entre elles, mais **pas dans les cellules endocrines**. Les cellules exocrines libèrent l'amylase vers l'intestin grêle : elle participe à la **digestion de l'[[amidon]]**.",
+      {table: {legende: "Comparer la localisation de deux molécules dans le pancréas", entetes: ["Molécule", "Cellules endocrines (îlots)", "Cellules exocrines", "Fonction"],
+       lignes: [["Insuline", "Détection élevée dans les cellules β (> 75 %)", "Non détectée", "Régulation de la glycémie"], ["Amylase", "Non détectée", "Détection élevée (> 75 %)", "Digestion de l'amidon"]]}},
+      "Les résultats sont **inverses** : chaque molécule est fabriquée par un seul des deux types de cellules. Dans un même organe, deux types de cellules spécialisées possèdent donc des **équipements moléculaires différents**."
+     ]},
+     {titre: "Un équipement moléculaire lié à la fonction", blocs: [
+      "On peut généraliser ces résultats à l'ensemble de l'organisme : **chaque type de cellule spécialisée possède un [[équipement moléculaire]] particulier et fabrique certaines molécules**, qui lui permettent de remplir **une fonction précise** au sein d'un tissu ou d'un organe. La fibre musculaire fabrique de l'actine et de la myosine pour se contracter ; la cellule β fabrique de l'insuline ; la cellule exocrine fabrique de l'amylase.",
+      "**Les différents types de cellules d'un même organisme ne fabriquent donc pas nécessairement les mêmes [[protéines|protéine]]** : leurs caractéristiques moléculaires sont liées à leurs fonctions. C'est ce qu'on appelle la **[[spécialisation cellulaire]]**.",
+      {aside: "Et ensuite ?", texte: "Toutes ces cellules proviennent pourtant d'une même cellule initiale. Pourquoi ne fabriquent-elles pas les mêmes molécules ? La réponse se trouve dans l'ADN : ce sera l'objet des parties 1.d) et 1.e)."}
+     ]}
+    ],
+    /* « En résumé » = les bilans du cahier, mot pour mot */
+    recap: [
+     {titre: "Bilan 1.c)", texte: "La spécialisation cellulaire ne concerne pas seulement la forme et l'organisation des cellules."},
+     {texte: "Chaque type de cellule spécialisée possède également un équipement moléculaire particulier et fabrique certaines molécules."},
+     {texte: "Ces molécules lui permettent de remplir une fonction précise au sein d'un tissu ou d'un organe."},
+     {texte: "Ainsi, les différents types de cellules d'un même organisme ne fabriquent pas nécessairement les mêmes protéines : leurs caractéristiques moléculaires sont liées à leurs fonctions."}
+    ]
+   },
+
+   flashcards: [
+    ["Équipement moléculaire", "Ensemble des molécules particulières fabriquées par un type de cellule."],
+    ["Spécialisation cellulaire", "Fait qu'une cellule a une organisation et des molécules liées à une fonction précise."],
+    ["Protéine", "Molécule fabriquée par la cellule, qui assure une fonction précise."],
+    ["Insuline", "Molécule fabriquée par les cellules β du pancréas, qui régule la glycémie."],
+    ["Amylase", "Protéine fabriquée par les cellules exocrines du pancréas, qui digère l'amidon."]
+   ],
+
+   qcm: [
+    {n: 1, q: "Dans le pancréas, l'insuline est fabriquée par :", o: ["les cellules exocrines", "les cellules β des îlots", "les cellules des canaux", "les cellules α des îlots"], r: 1, e: "L'insuline est détectée dans les cellules β des îlots de Langerhans."},
+    {n: 1, q: "Dans le pancréas, l'amylase est fabriquée par :", o: ["les cellules β", "les cellules α", "les cellules exocrines", "les cellules des îlots"], r: 2, e: "Elle n'est pas détectée dans les cellules endocrines des îlots."},
+    {n: 1, q: "L'insuline participe à :", o: ["la digestion de l'amidon", "la régulation de la glycémie", "la contraction des muscles", "la cohésion des tissus"], r: 1, e: "La glycémie est la concentration de glucose dans le sang."},
+    {n: 1, q: "L'amylase fabriquée par le pancréas est libérée :", o: ["dans la circulation sanguine", "vers l'intestin grêle", "dans les îlots", "vers l'estomac"], r: 1, e: "Elle y participe à la digestion de l'amidon."},
+    {n: 1, q: "Une cellule endocrine libère les substances qu'elle fabrique :", o: ["dans le sang", "dans le tube digestif", "dans son propre noyau", "à la surface du corps"], r: 0, e: "Une cellule exocrine les libère hors du sang, par exemple vers le tube digestif."},
+    {n: 1, q: "Les îlots de Langerhans sont :", o: ["des amas de cellules endocrines du pancréas", "des amas de cellules exocrines du pancréas", "des canaux qui transportent l'amylase", "des vaisseaux sanguins du pancréas"], r: 0, e: "Ils contiennent notamment les cellules β."},
+    {n: 2, q: "Sur une coupe de pancréas traitée pour repérer l'insuline, de petits amas sont bruns et le reste n'est pas marqué. Ces amas sont :", o: ["les îlots de Langerhans", "les cellules exocrines", "les canaux pancréatiques", "les vaisseaux sanguins"], r: 0, e: "Le marquage brun révèle les cellules qui contiennent l'insuline : les cellules β des îlots."},
+    {n: 2, q: "Sur une coupe traitée pour repérer l'amylase, on s'attend à voir :", o: ["les îlots marqués, le reste non marqué", "les îlots non marqués, le reste marqué", "toutes les cellules du pancréas marquées", "aucune cellule du pancréas marquée"], r: 1, e: "L'amylase est dans les cellules exocrines, qui entourent les îlots."},
+    {n: 2, q: "Quel est le point commun entre les résultats obtenus pour l'insuline et pour l'amylase ?", o: ["Chaque molécule est détectée dans un seul type de cellule", "Les deux molécules sont détectées dans les mêmes cellules", "Les deux molécules sont libérées dans le sang", "Chaque molécule est détectée dans toutes les cellules"], r: 0, e: "Leur répartition est inverse : l'une dans les cellules endocrines, l'autre dans les cellules exocrines."},
+    {n: 2, q: "« Détection élevée dans plus de 75 % des cellules endocrines » signifie que :", o: ["plus de trois cellules endocrines sur quatre sont marquées", "plus de trois cellules du pancréas sur quatre sont marquées", "moins d'une cellule endocrine sur quatre est marquée", "les trois quarts de l'insuline sont hors des îlots"], r: 0, e: "Le pourcentage porte sur les cellules endocrines, pas sur tout le pancréas."},
+    {n: 2, q: "En fluorescence, les noyaux sont bleus dans toutes les cellules, mais l'amylase (verte) n'apparaît que dans certaines. Cela montre que :", o: ["toutes ont un noyau, mais pas les mêmes molécules", "seules les cellules vertes possèdent un noyau", "les cellules non vertes sont des cellules mortes", "le marquage vert se fixe sur tous les noyaux"], r: 0, e: "Les cellules diffèrent par leur équipement moléculaire, pas par la présence d'un noyau."},
+    {n: 2, q: "L'équipement moléculaire d'une cellule désigne :", o: ["les molécules particulières qu'elle fabrique et possède", "les organes avec lesquels elle échange certaines molécules", "les molécules qu'elle reçoit des cellules voisines", "les structures visibles qui lui donnent sa forme"], r: 0, e: "Il est en lien avec la fonction de la cellule."},
+    {n: 2, q: "Pourquoi dit-on que la cellule β est une cellule spécialisée ?", o: ["Elle fabrique une molécule liée à sa fonction", "Elle fabrique toutes les molécules du pancréas", "Elle est plus grande que les autres cellules", "Elle est la seule à posséder un noyau"], r: 0, e: "Elle fabrique l'insuline, qui lui permet d'assurer sa fonction : réguler la glycémie."},
+    {n: 2, q: "Pourquoi faut-il un marquage pour localiser l'insuline dans le pancréas ?", o: ["Une molécule est invisible au microscope sans marquage", "L'insuline est détruite par la lumière du microscope", "Les cellules β sont trop petites pour être observées", "Le marquage fait fabriquer de l'insuline aux cellules"], r: 0, e: "Le marquage se fixe sur la molécule recherchée et révèle les cellules qui la contiennent."},
+    {n: 3, q: "Le glucagon est détecté uniquement dans les cellules α des îlots. D'après le cours, on peut dire que :", o: ["les cellules α et β ont des équipements moléculaires différents", "les cellules α et β fabriquent toutes les deux la même molécule", "les cellules α sont des cellules exocrines du pancréas", "le glucagon participe à la digestion de l'amidon"], r: 0, e: "Même dans un îlot, deux types de cellules voisines ne fabriquent pas les mêmes molécules."},
+    {n: 3, q: "Si les cellules β sont détruites, la conséquence directe est :", o: ["une glycémie mal régulée", "un amidon mal digéré", "une absence d'amylase", "une disparition des îlots"], r: 0, e: "Sans cellules β, plus d'insuline : c'est ce qui se passe dans le diabète de type 1."},
+    {n: 3, q: "Une maladie détruit les cellules exocrines du pancréas mais épargne les îlots. On s'attend à :", o: ["une digestion de l'amidon perturbée, une glycémie régulée", "une glycémie mal régulée, une digestion de l'amidon normale", "une glycémie et une digestion toutes les deux perturbées", "aucune conséquence : les îlots fabriquent alors l'amylase"], r: 0, e: "Chaque type de cellule a sa fonction : les cellules β ne peuvent pas remplacer les cellules exocrines."},
+    {n: 3, q: "La fibre musculaire contient beaucoup de myosine, la cellule β beaucoup d'insuline. Cela illustre que :", o: ["les cellules spécialisées ne fabriquent pas les mêmes protéines", "les cellules spécialisées n'ont pas toutes le même nombre de noyaux", "les cellules d'un même organe sont toutes identiques", "les protéines sont fabriquées par un seul organe"], r: 0, e: "Chaque type de cellule a un équipement moléculaire lié à sa fonction."},
+    {n: 3, q: "« La spécialisation, c'est uniquement une question de forme. » Quel résultat de l'activité contredit cette phrase ?", o: ["Les cellules β et exocrines fabriquent des molécules différentes", "Toutes les cellules du pancréas possèdent un noyau coloré en bleu", "Le pancréas contient des îlots entourés d'autres cellules", "Les coupes de pancréas sont observées au microscope"], r: 0, e: "La spécialisation concerne aussi l'équipement moléculaire."},
+    {n: 3, q: "On recherche l'insuline, avec le même marquage, sur une coupe de muscle. Résultat le plus probable :", o: ["aucune cellule n'est marquée", "toutes les cellules sont marquées", "seuls les noyaux sont marqués", "seules les fibres sont marquées"], r: 0, e: "Les cellules du muscle ne fabriquent pas d'insuline : leur équipement moléculaire est différent."},
+    {n: 3, q: "Quelle phrase généralise le mieux les résultats de l'activité à tout l'organisme ?", o: ["Chaque type cellulaire fabrique des molécules liées à sa fonction", "Chaque organe fabrique une seule molécule liée à sa fonction", "Chaque type cellulaire fabrique toutes les molécules du corps", "Chaque molécule est fabriquée par toutes les cellules de l'organisme"], r: 0, e: "Le pancréas lui-même contient plusieurs types de cellules, qui fabriquent des molécules différentes."}
+   ]
+  },
+  /* ================================================================ 1d */
+  {
+   id: "1d",
+   titre: "La structure de la molécule d'ADN",
+   problematique: "Comment la molécule d'ADN est-elle organisée ?",
+
+   activites: [
+    {
+     type: "Activité", titre: "Étude de la molécule d'ADN",
+     resume: "<b>Pourquoi cette activité ?</b> En 1.c), on a vu que les cellules spécialisées ne fabriquent pas les mêmes molécules. Pour comprendre d'où vient cette différence, il faut d'abord connaître la molécule qui porte l'information de la cellule : l'ADN, qui constitue les chromosomes du noyau. Avant de chercher ce que l'ADN « dit », on a donc cherché comment il est construit.<br><br><b>Ce qu'on a fait.</b> On a lu un extrait de l'article de Watson et Crick (1953), qui décrit la forme de la molécule. On a ensuite observé avec le logiciel Libmol un modèle en 3D d'une courte portion d'ADN de 14 paires de nucléotides : coloration « par chaînes » pour repérer les brins, « par résidus » pour repérer les nucléotides, puis onglet « Séquences » pour lire leur ordre. Enfin, on a confronté ces observations aux mesures de Chargaff (1950) sur l'ADN de l'être humain, du blé et d'une bactérie, avant de compléter un schéma de la molécule.<br><br><b>À quoi ça nous a servi.</b> À établir l'organisation de l'ADN : une double hélice, deux brins, quatre types de nucléotides, associés toujours de la même façon (A avec T, C avec G). On s'est aussi entraîné à confronter une observation à des données chiffrées pour valider une idée. Ces connaissances sont indispensables pour la suite : en 1.e), on verra que c'est l'ordre des nucléotides qui porte l'information génétique.",
+     correction: [
+      ["Décrire l'organisation générale de la molécule d'ADN", "La molécule d'ADN est constituée de deux brins enroulés l'un autour de l'autre autour d'un même axe. Elle possède donc une forme de double hélice."],
+      ["Déterminer les associations entre les nucléotides des deux brins", "L'observation avec Libmol montre que les nucléotides placés face à face s'associent toujours de la même manière : l'adénine A s'associe avec la thymine T ; la cytosine C s'associe avec la guanine G.<br>Les données de Chargaff confirment ces associations. Dans l'ADN du thymus humain, la proportion d'adénine est proche de celle de thymine (30,9 % contre 29,4 %) et la proportion de cytosine est proche de celle de guanine (19,8 % contre 19,9 %). Des résultats comparables sont observés chez le blé et la bactérie <i>Escherichia coli</i>.<br>Les deux brins de la molécule d'ADN sont donc complémentaires."],
+      ["Compléter le schéma de la molécule d'ADN", "Sur le schéma complété, on doit retrouver : les deux brins ; sur chaque brin, une succession de nucléotides ; entre les deux brins, les nucléotides placés face à face, A avec T et C avec G."],
+      ["Répondre à la problématique", "La molécule d'ADN forme une double hélice constituée de deux brins enroulés l'un autour de l'autre. Chaque brin est une succession de nucléotides. Il existe quatre types de nucléotides : A, T, C et G. Les nucléotides des deux brins s'associent de manière complémentaire : A est toujours placé en face de T et C en face de G."]
+     ],
+     conclusionTitre: "Conclusion de l'activité",
+     conclusion: "L'observation avec Libmol montre que la molécule d'ADN est formée de deux brins enroulés l'un autour de l'autre en une double hélice. Les données de Chargaff montrent que la proportion d'adénine (A) est proche de celle de thymine (T) et que la proportion de cytosine (C) est proche de celle de guanine (G). Les nucléotides s'associent donc de manière précise : A avec T et C avec G.",
+     lien: {texte: "Revoir la molécule d'ADN dans Libmol", url: "https://libmol.org/"}
+    }
+   ],
+
+   essentiel: {
+    sections: [
+     {titre: "L'ADN, la molécule des chromosomes", blocs: [
+      "**Les [[chromosomes|chromosome]] présents dans le [[noyau]] des cellules sont constitués d'[[ADN]]** (acide désoxyribonucléique). L'ADN est une molécule très longue et très fine : c'est elle qui porte l'information de la cellule."
+     ]},
+     {titre: "Une double hélice formée de deux brins", blocs: [
+      "**La molécule d'ADN possède une structure en [[double hélice]]** : elle est formée de **deux [[brins|brin]]**, enroulés l'un autour de l'autre.",
+      "On peut se la représenter comme une échelle que l'on aurait tordue : les deux brins en sont les montants, et les barreaux relient un brin à l'autre."
+     ]},
+     {titre: "Quatre nucléotides, associés de manière complémentaire", blocs: [
+      "**Chaque brin est constitué d'une succession de [[nucléotides|nucléotide]]**, placés les uns à la suite des autres comme les perles d'un collier. **Il existe quatre types de nucléotides, désignés par les lettres A, T, C et G** (adénine, thymine, cytosine et guanine).",
+      "D'un brin à l'autre, les nucléotides se font face deux par deux, et pas au hasard : **A est toujours placé en face de T, et C en face de G**. C'est la **[[complémentarité]]** : chaque paire forme un barreau de l'échelle.",
+      "Les deux brins sont donc des **[[brins complémentaires]]** : si l'on connaît l'ordre des nucléotides d'un brin, on peut en déduire celui de l'autre. Autre conséquence : dans une molécule d'ADN, il y a autant de A que de T, et autant de C que de G.",
+      {table: {legende: "Exemple : retrouver le brin complémentaire", entetes: ["", "Ordre des nucléotides"],
+       lignes: [["Brin 1", "A – T – G – C – C – A"], ["Brin 2 (complémentaire)", "T – A – C – G – G – T"]]}}
+     ]},
+     {titre: "Une structure commune, un ordre des nucléotides variable", blocs: [
+      "**Cette structure générale est commune aux molécules d'ADN des êtres vivants** : chez un être humain, une plante ou une bactérie, on retrouve la double hélice, les deux brins complémentaires et les quatre mêmes nucléotides.",
+      "**En revanche, l'ordre des nucléotides peut varier le long de la molécule** : cet ordre s'appelle la **[[séquence]]**. C'est lui qui change d'une molécule d'ADN à une autre.",
+      {table: {legende: "Ce qui est commun et ce qui varie", entetes: ["", "Dans l'ADN des êtres vivants"],
+       lignes: [["Ce qui est commun", "La double hélice, les deux brins complémentaires, les quatre nucléotides, les associations A–T et C–G"], ["Ce qui varie", "L'ordre des nucléotides le long de la molécule (la séquence)"]]}}
+     ]}
+    ],
+    /* « En résumé » = les bilans du cahier, mot pour mot */
+    recap: [
+     {titre: "Bilan 1.d)", texte: "Les chromosomes présents dans le noyau des cellules sont constitués d'ADN. La molécule d'ADN possède une structure en double hélice formée de deux brins complémentaires."},
+     {texte: "Chaque brin est constitué d'une succession de nucléotides. Il existe quatre types de nucléotides, désignés par les lettres A, T, C et G. Les nucléotides des deux brins s'associent de manière complémentaire : A est toujours placé en face de T et C en face de G."},
+     {texte: "Cette structure générale est commune aux molécules d'ADN des êtres vivants. En revanche, l'ordre des nucléotides peut varier le long de la molécule."}
+    ]
+   },
+
+   flashcards: [
+    ["ADN", "Molécule en double hélice qui constitue les chromosomes."],
+    ["Chromosome", "Structure du noyau constituée d'ADN."],
+    ["Double hélice", "Forme de l'ADN : deux brins enroulés l'un autour de l'autre."],
+    ["Brin", "Chaîne de nucléotides. L'ADN en possède deux."],
+    ["Nucléotide", "Unité de base de l'ADN. Il en existe quatre : A, T, C et G."],
+    ["Complémentarité", "Règle d'association des nucléotides : A en face de T, C en face de G."],
+    ["Séquence", "Ordre des nucléotides le long d'un brin d'ADN."]
+   ],
+
+   qcm: [
+    {n: 1, q: "La molécule d'ADN est formée de :", o: ["un seul brin enroulé sur lui-même", "deux brins enroulés en hélice", "trois brins enroulés en hélice", "deux brins parallèles et droits"], r: 1, e: "Deux brins enroulés l'un autour de l'autre : c'est la double hélice."},
+    {n: 1, q: "Dans une cellule humaine, l'ADN des chromosomes se trouve dans :", o: ["la membrane plasmique", "le cytoplasme", "le noyau", "la matrice extracellulaire"], r: 2, e: "Les chromosomes, constitués d'ADN, sont dans le noyau."},
+    {n: 1, q: "Un brin d'ADN est constitué :", o: ["d'une succession de nucléotides", "d'une succession de chromosomes", "d'une succession de protéines", "d'une succession de cellules"], r: 0, e: "Le nucléotide est l'unité qui constitue l'ADN."},
+    {n: 1, q: "Combien de types de nucléotides trouve-t-on dans l'ADN ?", o: ["2", "4", "14", "46"], r: 1, e: "Quatre types : A, T, C et G."},
+    {n: 1, q: "Dans l'ADN, le nucléotide A est toujours placé en face de :", o: ["A", "T", "C", "G"], r: 1, e: "A avec T, C avec G."},
+    {n: 1, q: "Dans l'ADN, le nucléotide C est toujours placé en face de :", o: ["A", "T", "C", "G"], r: 3, e: "C avec G, A avec T."},
+    {n: 1, q: "Les chromosomes sont constitués :", o: ["d'ADN", "de pectines", "de collagène", "d'amylase"], r: 0, e: "Les pectines et le collagène sont dans la matrice extracellulaire ; l'amylase est fabriquée par le pancréas."},
+    {n: 2, q: "Un brin porte la séquence A T G C C A. Le brin complémentaire est :", o: ["A T G C C A", "T A C G G T", "T A G C C T", "G C A T T G"], r: 1, e: "On remplace chaque A par T, T par A, C par G et G par C."},
+    {n: 2, q: "Chez le blé, Chargaff mesure 27,3 % de A. Quelle valeur attend-on pour T ?", o: ["environ 23 %", "environ 27 %", "environ 50 %", "environ 73 %"], r: 1, e: "Chaque A est associé à un T : leurs proportions sont proches (27,1 % mesurés)."},
+    {n: 2, q: "Thymus humain : 30,9 % de A et 29,4 % de T. Comment expliquer ce faible écart ?", o: ["Par les limites des méthodes de mesure de l'époque", "Par une erreur dans le modèle de la double hélice", "Par l'absence de thymine dans certaines cellules", "Par un nombre de brins variable selon les cellules"], r: 0, e: "L'écart est faible : il vient de la précision des mesures, pas de la règle A–T."},
+    {n: 2, q: "Dans Libmol, « Colorer par chaînes » fait apparaître deux couleurs. Cela montre que la molécule :", o: ["est formée de deux brins", "contient deux nucléotides", "possède deux noyaux", "provient de deux cellules"], r: 0, e: "Une chaîne = un brin. Deux couleurs : deux brins."},
+    {n: 2, q: "Quelle donnée de Chargaff appuie l'association entre C et G ?", o: ["Les proportions de C et de G sont proches", "Les proportions de A et de C sont proches", "La proportion de C est la plus élevée", "La somme de C et de G vaut 100 %"], r: 0, e: "Si chaque C est en face d'un G, il y a autant de C que de G."},
+    {n: 2, q: "Qu'est-ce qui est commun à l'ADN de l'être humain, du blé et d'une bactérie ?", o: ["La structure en double hélice", "L'ordre des nucléotides", "Les proportions de A et de C", "La longueur de la molécule"], r: 0, e: "La structure générale est commune aux êtres vivants ; l'ordre des nucléotides varie."},
+    {n: 2, q: "Qu'est-ce qui peut varier d'une molécule d'ADN à une autre ?", o: ["L'ordre des nucléotides le long des brins", "Le nombre de brins qui forment la molécule", "Les règles d'association A–T et C–G", "Le nombre de types de nucléotides"], r: 0, e: "Deux brins, quatre nucléotides, A–T et C–G : cela ne change pas. L'ordre, lui, varie."},
+    {n: 2, q: "Dire que les deux brins de l'ADN sont complémentaires signifie que :", o: ["l'ordre des nucléotides de l'un impose celui de l'autre", "les deux brins portent exactement le même ordre de nucléotides", "les deux brins ont la même couleur dans Libmol", "un brin contient A et T, l'autre contient C et G"], r: 0, e: "En face d'un A il y a toujours un T, en face d'un C toujours un G."},
+    {n: 2, q: "Le modèle observé dans Libmol contient 14 paires de nucléotides. Combien de nucléotides au total ?", o: ["7", "14", "28", "56"], r: 2, e: "Une paire = 2 nucléotides face à face : 14 × 2 = 28."},
+    {n: 3, q: "Un ADN contient 20 % de C. Quel est son pourcentage de A ?", o: ["20 %", "30 %", "60 %", "80 %"], r: 1, e: "C = G = 20 %, donc A + T = 60 % ; comme A = T, A = 30 %."},
+    {n: 3, q: "Un ADN contient 28 % de A. Quel est son pourcentage de G ?", o: ["22 %", "28 %", "44 %", "72 %"], r: 0, e: "A = T = 28 %, donc C + G = 44 % ; comme C = G, G = 22 %."},
+    {n: 3, q: "« Dans l'ADN, il y a toujours autant de A que de C. » Que répondre à cette affirmation ?", o: ["Faux : chez l'humain, A vaut 30,9 % et C 19,8 %", "Vrai : les quatre nucléotides valent toujours 25 %", "Vrai : A s'associe aussi bien avec T qu'avec C", "Faux : il n'y a jamais de C dans l'ADN humain"], r: 0, e: "La règle relie A à T et C à G, pas A à C."},
+    {n: 3, q: "Un brin de 10 nucléotides contient 3 A, 2 T, 4 C et 1 G. Le brin complémentaire contient :", o: ["3 A, 2 T, 4 C et 1 G", "2 A, 3 T, 1 C et 4 G", "4 A, 1 T, 3 C et 2 G", "1 A, 4 T, 2 C et 3 G"], r: 1, e: "En face de 3 A : 3 T ; de 2 T : 2 A ; de 4 C : 4 G ; de 1 G : 1 C."},
+    {n: 3, q: "Pourquoi les mesures de Chargaff ne suffisaient-elles pas, seules, à connaître la structure de l'ADN ?", o: ["Elles donnent des proportions, pas la forme de la molécule", "Elles ne concernent que l'ADN des cellules de l'être humain", "Elles montrent que A et T sont en quantités différentes", "Elles ont été obtenues après le modèle de 1953"], r: 0, e: "Il fallait aussi connaître la forme : c'est ce qu'apporte le modèle de la double hélice."},
+    {n: 3, q: "Deux ADN ont exactement les mêmes proportions de A, T, C et G. Sont-ils forcément identiques ?", o: ["Non : l'ordre des nucléotides peut être différent", "Oui : les proportions suffisent à décrire un ADN", "Oui : ils ont forcément la même longueur", "Non : leur nombre de brins peut être différent"], r: 0, e: "Avec les mêmes nucléotides, on peut écrire des ordres très différents."},
+    {n: 3, q: "Sur un brin, on lit T T A C G. Un élève propose A A T C G pour l'autre brin. Où est l'erreur ?", o: ["Aux deux dernières positions : il fallait G puis C", "Aux deux premières positions : il fallait T puis T", "À la troisième position : il fallait placer un A", "Nulle part : sa proposition est tout à fait correcte"], r: 0, e: "Le brin complémentaire est A A T G C : en face de C il faut G, en face de G il faut C."}
+   ]
+  },
+  /* ================================================================ 1e */
+  {
+   id: "1e",
+   titre: "C'est fort en choco… !",
+   problematique: "Comment expliquer que la sensibilité au PTC soit différente selon les individus ?",
+
+   activites: [
+    {
+     type: "TP", titre: "C'est fort en choco… !",
+     resume: "<b>Pourquoi ce TP ?</b> En 1.d), on a vu que la structure de l'ADN est la même chez tous les êtres vivants, mais que l'ordre des nucléotides peut varier. Il restait à comprendre à quoi sert cet ordre. On est parti d'une situation concrète : devant le même chocolat noir, certaines personnes le trouvent très amer et d'autres peu amer. Pour étudier cette différence, les scientifiques utilisent le PTC, une substance amère.<br><br><b>Ce qu'on a fait.</b> On a formulé une question scientifique, puis conçu un protocole pour tester sa propre sensibilité au PTC : une bandelette témoin, puis une bandelette contenant du PTC, dans les mêmes conditions. On a ensuite comparé avec le logiciel Géniegen2 deux séquences du gène humain TAS2R38, appelées PAV et AVI. Enfin, on a exploité un graphique montrant comment deux formes d'un récepteur des cellules gustatives répondent à des concentrations croissantes de PTC.<br><br><b>À quoi ça nous a servi.</b> À comprendre ce qu'est un gène : une portion d'ADN dont la séquence porte une information. On a vu que cette séquence peut être légèrement différente d'un individu à l'autre, et que ces différences peuvent se traduire par des caractères différents. On s'est aussi entraîné à formuler une question scientifique et à concevoir un protocole avec un témoin.",
+     correction: [
+      ["Formuler une question scientifique", "Exemple de question attendue : « Comment expliquer que la sensibilité au PTC soit différente selon les individus ? »<br>La question doit relier clairement les différences de perception à la recherche d'une explication scientifique."],
+      ["Concevoir un protocole pour tester la sensibilité au PTC", "Préparer une bandelette témoin et une bandelette contenant du PTC pour chaque élève. Tester d'abord la bandelette témoin et noter la sensation ressentie. Se rincer la bouche avec de l'eau. Tester la bandelette contenant du PTC dans les mêmes conditions. Classer la sensation ressentie : absente, faible ou forte. Comparer les résultats des deux élèves du binôme. Jeter immédiatement les bandelettes après utilisation.<br><b>Éléments indispensables :</b> l'utilisation du témoin ; des conditions identiques pour les deux essais ; la bandelette témoin testée avant le PTC ; un résultat observable et noté ; le respect des règles d'hygiène."],
+      ["Comparer les séquences et exploiter le document 2", "<b>Avec Géniegen2 :</b> les séquences PAV et AVI du gène TAS2R38 présentent trois différences de nucléotides. Position 145 : C pour PAV, G pour AVI. Position 785 : C pour PAV, T pour AVI. Position 886 : G pour PAV, A pour AVI. Les deux séquences correspondent donc au même gène, mais leur ordre de nucléotides n'est pas exactement identique.<br><b>Document 2 :</b> la réponse des cellules produisant la forme PAV augmente avec la concentration en PTC ; elle atteint environ 0,9 aux concentrations les plus élevées. La réponse des cellules produisant la forme AVI reste proche de 0, même lorsque la concentration en PTC augmente. La forme PAV du récepteur répond donc fortement au PTC, tandis que la forme AVI y répond très peu.<br>Ces différences de séquence peuvent donc contribuer aux différences de sensibilité observées entre les individus."],
+      ["Répondre à la question formulée en C1", "Les individus ne perçoivent pas tous le PTC avec la même intensité. Le gène TAS2R38 est une portion d'ADN caractérisée par une séquence de nucléotides. Cette séquence peut présenter certaines différences entre les individus. Les formes PAV et AVI sont associées à des récepteurs qui ne répondent pas de la même manière au PTC. Des différences dans la séquence d'un gène peuvent donc contribuer à des différences de caractères entre les individus."]
+     ],
+     conclusionTitre: "Conclusion de l'activité",
+     conclusion: "La sensibilité au PTC peut varier selon les individus. Géniegen2 montre que les séquences PAV et AVI du gène TAS2R38 diffèrent par trois nucléotides. Les documents montrent que les formes PAV et AVI du récepteur ne répondent pas de la même manière au PTC. Des différences dans la séquence d'un gène peuvent donc modifier le fonctionnement de la molécule correspondante et contribuer à des différences de caractères entre les individus.",
+     lien: {texte: "Refaire la comparaison avec Géniegen2", url: "https://www.pedagogie.ac-nice.fr/svt/productions/geniegen2/"}
+    }
+   ],
+
+   essentiel: {
+    sections: [
+     {titre: "Le gène, une portion d'ADN qui porte une information", blocs: [
+      "**Un [[gène]] est une portion d'ADN caractérisée par une [[séquence]] précise de nucléotides.** Une molécule d'ADN est très longue : elle porte de nombreux gènes, placés les uns à la suite des autres.",
+      "**Cette séquence porte une [[information génétique]].** On peut la comparer à une recette : l'ordre des nucléotides indique à la cellule comment fabriquer une molécule précise, le plus souvent une [[protéine]]."
+     ]},
+     {titre: "Des différences de séquence entre les individus", blocs: [
+      "**La séquence d'un gène peut présenter certaines différences entre les individus.** Il s'agit du même gène, mais quelques nucléotides ne sont pas les mêmes.",
+      "Ces différences peuvent modifier la molécule fabriquée et son fonctionnement. **Elles peuvent ainsi contribuer à la diversité des [[caractères|caractère]]** des individus, par exemple une sensibilité plus ou moins forte à l'amertume.",
+      {table: {legende: "De la séquence au caractère", entetes: ["Étape", "Ce qui change d'un individu à l'autre"],
+       lignes: [["Séquence du gène", "Quelques nucléotides différents"], ["Molécule fabriquée", "Une forme légèrement différente, qui ne fonctionne pas de la même manière"], ["Caractère", "Une différence observable entre les individus"]]}}
+     ]},
+     {titre: "La même information génétique dans toutes les cellules", blocs: [
+      "**Toutes les cellules d'un même organisme possèdent initialement la même information génétique.** Elles proviennent toutes, par divisions successives, d'une même cellule initiale, la [[cellule-œuf]] : elles en ont reçu les mêmes gènes.",
+      "Un neurone, une fibre musculaire et une cellule du pancréas d'une même personne possèdent donc les mêmes gènes."
+     ]},
+     {titre: "Des cellules spécialisées qui n'expriment qu'une partie de cette information", blocs: [
+      "Si toutes les cellules ont les mêmes gènes, pourquoi sont-elles si différentes ? Parce qu'elles ne les utilisent pas tous. **Les cellules spécialisées n'[[expriment|expression d'un gène]] qu'une partie de leur information génétique** : exprimer un gène, c'est utiliser son information pour fabriquer la molécule correspondante.",
+      "**Elles fabriquent ainsi des molécules particulières, en relation avec leur fonction.** C'est ce qui explique l'équipement moléculaire propre à chaque type de cellule, vu en 1.c).",
+      {table: {legende: "Mêmes gènes, mais pas les mêmes gènes exprimés", entetes: ["Cellule", "Gène de la myosine", "Gène de l'insuline", "Gène de l'amylase"],
+       lignes: [["Fibre musculaire", "Présent et exprimé", "Présent, non exprimé", "Présent, non exprimé"], ["Cellule β du pancréas", "Présent, non exprimé", "Présent et exprimé", "Présent, non exprimé"], ["Cellule exocrine du pancréas", "Présent, non exprimé", "Présent, non exprimé", "Présent et exprimé"]]}},
+      {aside: "À ne pas confondre", texte: "Une cellule spécialisée n'a pas perdu les gènes qu'elle n'utilise pas : ils sont toujours présents dans son noyau, mais ils ne sont pas exprimés."}
+     ]}
+    ],
+    /* « En résumé » = les bilans du cahier, mot pour mot */
+    recap: [
+     {titre: "Bilan 1.e)", texte: "Un gène est une portion d'ADN caractérisée par une séquence précise de nucléotides. Cette séquence porte une information génétique."},
+     {texte: "Elle peut présenter certaines différences entre les individus, pouvant contribuer à la diversité de leurs caractères."},
+     {texte: "Toutes les cellules d'un même organisme possèdent initialement la même information génétique."},
+     {texte: "Cependant, les cellules spécialisées n'expriment qu'une partie de cette information : elles fabriquent ainsi des molécules particulières en relation avec leur fonction."},
+     {titre: "Bilan du chapitre 1", texte: "Chez un organisme unicellulaire, une seule cellule assure toutes les fonctions. Chez un organisme pluricellulaire, les organes sont constitués de tissus formés de cellules spécialisées. Ces cellules possèdent une organisation particulière et fabriquent des molécules spécifiques, en relation avec leur fonction."},
+     {texte: "Dans les tissus, les cellules sont associées grâce à une matrice extracellulaire. Chez les végétaux, cette matrice forme notamment la paroi cellulaire ; la lamelle moyenne riche en pectines participe à l'adhérence entre les cellules."},
+     {texte: "Toutes les cellules d'un organisme proviennent d'une cellule initiale et possèdent initialement la même information génétique. Cette information est portée par l'ADN, une molécule formée de deux brins complémentaires de nucléotides enroulés en double hélice. Un gène est une portion d'ADN caractérisée par une séquence précise de nucléotides. Les cellules spécialisées n'expriment qu'une partie de cette information, ce qui leur permet de fabriquer des molécules en lien avec leur fonction. Des différences dans la séquence d'un gène peuvent également contribuer à des différences de caractères entre les individus."}
+    ]
+   },
+
+   flashcards: [
+    ["Gène", "Portion d'ADN dont la séquence porte une information génétique."],
+    ["Information génétique", "Information portée par la séquence des nucléotides de l'ADN."],
+    ["Caractère", "Particularité observable d'un individu."],
+    ["Expression d'un gène", "Utilisation d'un gène par la cellule pour fabriquer une molécule."],
+    ["Témoin", "Essai de référence, sans le facteur étudié, qui sert à comparer."]
+   ],
+
+   qcm: [
+    {n: 1, q: "Un gène est :", o: ["une portion d'ADN", "une portion de protéine", "un type de nucléotide", "un type de cellule"], r: 0, e: "Un gène est une portion d'ADN caractérisée par une séquence précise de nucléotides."},
+    {n: 1, q: "Un gène est caractérisé par :", o: ["sa séquence de nucléotides", "sa couleur dans le noyau", "son nombre de brins", "sa place dans le cytoplasme"], r: 0, e: "C'est l'ordre des nucléotides qui caractérise un gène."},
+    {n: 1, q: "L'information génétique est portée par :", o: ["la séquence des nucléotides de l'ADN", "la forme en double hélice de l'ADN", "la membrane plasmique de la cellule", "la matrice extracellulaire du tissu"], r: 0, e: "La double hélice est la même partout ; c'est la séquence qui porte l'information."},
+    {n: 1, q: "Les cellules d'un même organisme possèdent initialement :", o: ["la même information génétique", "une information génétique différente", "un seul gène chacune", "la moitié des gènes chacune"], r: 0, e: "Elles proviennent toutes de la même cellule initiale."},
+    {n: 1, q: "Une cellule spécialisée exprime :", o: ["tous ses gènes", "une partie de ses gènes", "aucun de ses gènes", "les gènes de ses voisines"], r: 1, e: "Elle n'utilise que les gènes utiles à sa fonction."},
+    {n: 1, q: "Dans le TP, la bandelette sans PTC sert :", o: ["de témoin", "de résultat", "d'hypothèse", "de conclusion"], r: 0, e: "Elle sert de point de comparaison."},
+    {n: 1, q: "Les séquences PAV et AVI du gène TAS2R38 diffèrent par :", o: ["un nucléotide", "trois nucléotides", "trente nucléotides", "tous leurs nucléotides"], r: 1, e: "Trois différences, aux positions 145, 785 et 886."},
+    {n: 2, q: "Deux personnes n'ont pas la même sensibilité au PTC. Quelle explication est cohérente avec le TP ?", o: ["Leurs séquences du gène TAS2R38 sont différentes", "L'une des deux personnes ne possède pas le gène TAS2R38", "Leurs ADN n'ont pas la même structure générale", "Leurs cellules gustatives n'ont pas de noyau"], r: 0, e: "Elles ont le même gène, mais pas exactement la même séquence."},
+    {n: 2, q: "Sur le graphique, la réponse des cellules AVI reste proche de 0 quand le PTC augmente. Cela signifie que :", o: ["la forme AVI du récepteur répond très peu au PTC", "la forme AVI du récepteur répond fortement au PTC", "les cellules AVI ne contiennent pas de récepteur", "les cellules AVI ont été exposées à beaucoup moins de PTC"], r: 0, e: "Une valeur proche de 0 correspond à une absence de réponse détectée."},
+    {n: 2, q: "Pourquoi tester la bandelette témoin avant la bandelette au PTC ?", o: ["Pour que le goût du PTC ne fausse pas le test témoin", "Pour que le PTC ait bien le temps d'agir sur le témoin", "Pour que la bandelette témoin devienne un peu plus amère", "Pour que les deux bandelettes aient le même goût"], r: 0, e: "Si l'on commence par le PTC, l'amertume peut rester en bouche."},
+    {n: 2, q: "Pourquoi se rincer la bouche entre les deux bandelettes ?", o: ["Pour tester dans les mêmes conditions", "Pour rendre le PTC bien plus amer", "Pour activer les récepteurs du goût", "Pour modifier la séquence du gène"], r: 0, e: "Une comparaison n'est fiable que si les conditions sont identiques."},
+    {n: 2, q: "Une cellule de peau et un neurone d'un même individu ont :", o: ["les mêmes gènes, mais n'expriment pas les mêmes", "des gènes différents, et les expriment tous", "les mêmes gènes, et les expriment tous", "des gènes différents, mais expriment les mêmes"], r: 0, e: "Même information génétique, mais chaque cellule n'en exprime qu'une partie."},
+    {n: 2, q: "La cellule β fabrique de l'insuline et pas d'amylase car :", o: ["elle exprime le gène de l'insuline, pas celui de l'amylase", "elle possède le gène de l'insuline, pas celui de l'amylase", "elle a perdu le gène de l'amylase en se spécialisant", "elle reçoit le gène de l'insuline par le sang"], r: 0, e: "Elle possède les deux gènes : c'est leur expression qui diffère."},
+    {n: 2, q: "Laquelle de ces questions est une bonne question scientifique ?", o: ["Pourquoi l'amertume varie-t-elle selon les personnes ?", "Le chocolat noir est-il meilleur que le chocolat au lait ?", "L'amertume vient d'un gène, n'est-ce pas ?", "Qui aime le plus le chocolat dans la classe ?"], r: 0, e: "Elle est précise, peut être testée et ne contient pas déjà la réponse."},
+    {n: 2, q: "Dire que PAV et AVI sont deux séquences du même gène signifie qu'elles :", o: ["sont presque identiques, à quelques nucléotides près", "sont totalement différentes l'une de l'autre, sauf en trois points", "se trouvent dans deux organes différents du même individu", "sont formées de nucléotides de types différents"], r: 0, e: "Même gène, mais un ordre de nucléotides qui n'est pas exactement identique."},
+    {n: 2, q: "Qu'est-ce qu'exprimer un gène ?", o: ["Utiliser son information pour fabriquer une molécule", "Copier sa séquence pour la transmettre à une autre cellule", "Modifier sa séquence pour changer de fonction", "Détruire son information pour se spécialiser"], r: 0, e: "Un gène exprimé est un gène que la cellule utilise."},
+    {n: 3, q: "Une fibre musculaire ne fabrique pas d'insuline. Dans cette cellule, le gène de l'insuline est :", o: ["présent mais non exprimé", "absent et non exprimé", "présent et bien exprimé", "absent mais exprimé"], r: 0, e: "Toutes les cellules ont les mêmes gènes ; seule l'expression change."},
+    {n: 3, q: "Si les formes PAV et AVI répondaient de la même façon au PTC, on conclurait que les trois différences de nucléotides :", o: ["n'expliquent pas la différence de sensibilité", "expliquent bien la différence de sensibilité", "rendent le récepteur plus sensible au PTC", "empêchent la fabrication du récepteur"], r: 0, e: "C'est parce que les deux formes répondent différemment qu'on peut relier séquence et caractère."},
+    {n: 3, q: "Un élève trouve amères les deux bandelettes, le témoin comme celle au PTC. Que peut-il conclure ?", o: ["Rien de sûr : le témoin ne devrait pas être amer", "Il est très sensible au PTC : tout lui paraît amer", "Il n'est pas sensible au PTC : le test est négatif", "Il a la forme AVI : son récepteur ne répond pas"], r: 0, e: "Si le témoin est perçu amer, la comparaison n'est plus fiable : il faut refaire le test."},
+    {n: 3, q: "Toutes les cellules d'un organisme ont la même information génétique car :", o: ["elles proviennent toutes d'une même cellule initiale", "elles échangent leurs gènes en passant par le sang", "elles ont toutes la même fonction dans l'organisme", "elles fabriquent toutes exactement les mêmes molécules"], r: 0, e: "Elles sont toutes issues de la cellule-œuf par divisions successives."},
+    {n: 3, q: "À la position 145, la séquence PAV porte C et la séquence AVI porte G. Sur le brin complémentaire, on trouve :", o: ["G pour PAV et C pour AVI", "C pour PAV et G pour AVI", "A pour PAV et T pour AVI", "G pour PAV et G pour AVI"], r: 0, e: "Complémentarité vue en 1.d) : en face de C il y a G, en face de G il y a C."},
+    {n: 3, q: "Quelle phrase relie correctement gène et caractère ?", o: ["Une différence de séquence peut modifier une molécule, donc un caractère", "Un caractère différent modifie la séquence du gène chez un individu", "Une différence de séquence change la structure en double hélice de l'ADN", "Un caractère dépend de la forme des cellules et jamais de leurs gènes"], r: 0, e: "Séquence du gène → molécule fabriquée → caractère."},
+    {n: 3, q: "On compare le gène TAS2R38 de deux vrais jumeaux, issus de la même cellule-œuf. On s'attend à trouver :", o: ["deux séquences identiques", "trois nucléotides différents", "deux gènes sans rapport", "un seul des deux gènes"], r: 0, e: "Issus de la même cellule initiale, ils ont reçu la même information génétique."}
+   ]
+  }
+  ]
+ }
+ ]
+}
+];
+
+
+/* =====================================================================
+   MOTEUR DU SITE
+   ===================================================================== */
+var app = document.getElementById('app');
+var crumbsEl = document.getElementById('crumbs');
+var tipEl = document.getElementById('tip');
+var S = {view: 'home', niveau: null, chap: null, partie: null, tab: 'essentiel'};
+var keyHandler = null;
+var NIVEAUX_LBL = {1: 'Facile', 2: 'Moyen', 3: 'Difficile'};
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function shuffle(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function $(id){ return document.getElementById(id); }
+function store(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem('svt2nde_' + k)); localStorage.setItem('svt2nde_' + k, JSON.stringify(v)); } catch(e){ return null; } }
+function setKeys(fn){ if (keyHandler) document.removeEventListener('keydown', keyHandler); keyHandler = fn; if (fn) document.addEventListener('keydown', fn); }
+function toTop(){ try { window.scrollTo({top: 0, behavior: 'smooth'}); } catch(e){ window.scrollTo(0, 0); } }
+
+/* Couleurs */
+function hexRgb(h){ h = h.replace('#', ''); return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)]; }
+/* En thème sombre, les couleurs de chapitre sont éclaircies pour rester lisibles */
+function colorVars(hex){
+  var c = hexRgb(hex), dark = typeof REG !== 'undefined' && REG.theme === 'sombre';
+  if (dark){
+    var c2 = c.map(function(x){ return Math.round(x + (255 - x) * .22); }), d2 = c.map(function(x){ return Math.round(x + (255 - x) * .55); });
+    var dp = c.map(function(x){ return Math.round(x * .8); });
+    return '--c:rgb(' + c2 + ');--c-soft:rgba(' + c + ',.18);--c-mid:rgba(' + c + ',.38);--c-ink:rgb(' + d2 + ');--c-deep:rgb(' + dp + ')';
+  }
+  var d = c.map(function(x){ return Math.round(x * .7); });
+  return '--c:' + hex + ';--c-soft:rgba(' + c + ',.08);--c-mid:rgba(' + c + ',.22);--c-ink:rgb(' + d + ');--c-deep:' + hex;
+}
+/* Couleur neutre (pages Tout réviser, Glossaire) */
+function neutre(){ return typeof REG !== 'undefined' && REG.theme === 'sombre' ? '#8f99a3' : '#2c3338'; }
+function chapColor(ch){ return ch.couleur || COULEURS[(ch.num - 1) % COULEURS.length]; }
+
+/* Parties visibles uniquement (une partie avec  cache: true  est masquée partout) */
+function allParties(niv){ var out = []; niv.chapitres.forEach(function(ch){ (ch.parties || []).filter(visible).forEach(function(p){ out.push({ch: ch, p: p}); }); }); return out; }
+function findPartie(id){
+  for (var i = 0; i < NIVEAUX.length; i++){ var l = allParties(NIVEAUX[i]); for (var j = 0; j < l.length; j++) if (l[j].p.id === id) return {niveau: NIVEAUX[i], ch: l[j].ch, p: l[j].p}; }
+  return null;
+}
+
+/* ---------- Glossaire ---------- */
+function norm(s){
+  s = String(s).toLowerCase().replace(/\([^)]*\)/g, '').replace(/[’']/g, "'").trim().replace(/\s+/g, ' ');
+  try { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); } catch(e){}
+  return s;
+}
+/* Éléments masqués (cache: true, ou "cache" en fin de flashcard) */
+function visible(x){ return !(x && (x.cache === true || (Array.isArray(x) && x[2] === 'cache'))); }
+function recapText(r){ return Array.isArray(r) ? r.filter(visible).map(function(b){ return b.texte; }).join(' ') : (r || ''); }
+
+var GLOSS = {};
+function addPart(k, x){ var g = GLOSS[k]; if (g && !g.parts.some(function(p){ return p.p === x.p; })) g.parts.push(x); }
+NIVEAUX.forEach(function(n){ allParties(n).forEach(function(x){ x.p.flashcards.filter(visible).forEach(function(c){ var k = norm(c[0]); if (!GLOSS[k]) GLOSS[k] = {t: c[0], d: c[1], parts: []}; addPart(k, x); }); }); });
+Object.keys(GLOSSAIRE).forEach(function(k){ if (!GLOSS[norm(k)]) GLOSS[norm(k)] = {t: k.charAt(0).toUpperCase() + k.slice(1), d: GLOSSAIRE[k], parts: []}; });
+/* Relie chaque terme aux parties dont le cours l'utilise */
+NIVEAUX.forEach(function(n){ allParties(n).forEach(function(x){
+  var e = x.p.essentiel, txt = [recapText(e.recap)].concat(e.intro && e.intro.texte || []);
+  e.sections.filter(visible).forEach(function(s){ s.blocs.forEach(function(b){ if (typeof b === 'string') txt.push(b); else if (b.texte) txt.push(b.texte); }); });
+  txt.join(' ').replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, function(_, a, b){ addPart(norm(b || a), x); return ''; });
+}); });
+/* Le glossaire ne garde que les mots utilisés dans les parties visibles */
+Object.keys(GLOSS).forEach(function(k){ if (!GLOSS[k].parts.length) delete GLOSS[k]; });
+
+/* Mise en forme : **gras**, *italique*, [[terme]] */
+function rich(s){
+  return String(s)
+    .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, function(_, txt, key){
+      var k = norm(key || txt);
+      if (!GLOSS[k]){ if (window.console) console.warn('Terme sans définition : ' + (key || txt)); return txt; }
+      return '<button type="button" class="term" data-k="' + esc(k) + '">' + txt + '</button>';
+    })
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+    .replace(/« /g, '« ').replace(/ ([»:;?!])/g, ' $1');
+}
+
+/* Bulle de définition (souris, clavier et tactile) */
+var tipFor = null, tipTimer = null;
+var FINE = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+function showTip(el){
+  clearTimeout(tipTimer);
+  var g = GLOSS[el.getAttribute('data-k')]; if (!g) return;
+  if (tipFor) tipFor.classList.remove('active');
+  tipFor = el; el.classList.add('active');
+  tipEl.innerHTML = '<b>' + esc(g.t) + '</b>' + esc(g.d) + '<i class="arrow"></i>';
+  var vw = document.documentElement.clientWidth, w = Math.min(320, vw - 24);
+  tipEl.style.width = w + 'px';
+  var rects = el.getClientRects(), r = rects.length ? rects[0] : el.getBoundingClientRect();
+  var left = Math.max(12, Math.min(r.left + r.width / 2 - w / 2, vw - w - 12));
+  var sx = window.pageXOffset, sy = window.pageYOffset;
+  tipEl.classList.remove('above');
+  tipEl.style.left = (left + sx) + 'px';
+  tipEl.style.top = (r.bottom + sy + 10) + 'px';
+  var th = tipEl.offsetHeight;
+  if (r.bottom + th + 20 > window.innerHeight && r.top - th - 20 > 60){ tipEl.style.top = (r.top + sy - th - 10) + 'px'; tipEl.classList.add('above'); }
+  tipEl.querySelector('.arrow').style.left = Math.max(10, Math.min(r.left + r.width / 2 - left - 6, w - 22)) + 'px';
+  tipEl.classList.add('show');
+}
+function hideTip(){ clearTimeout(tipTimer); tipEl.classList.remove('show'); if (tipFor) tipFor.classList.remove('active'); tipFor = null; }
+document.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('.term') : null;
+  if (t){ e.preventDefault(); if (tipFor === t && !FINE) hideTip(); else showTip(t); return; }
+  if (!tipEl.contains(e.target)) hideTip();
+});
+if (FINE){
+  document.addEventListener('mouseover', function(e){ var t = e.target.closest && e.target.closest('.term'); if (t) showTip(t); });
+  document.addEventListener('mouseout', function(e){ var t = e.target.closest && e.target.closest('.term'); if (t) tipTimer = setTimeout(hideTip, 180); });
+  tipEl.addEventListener('mouseenter', function(){ clearTimeout(tipTimer); });
+  tipEl.addEventListener('mouseleave', function(){ tipTimer = setTimeout(hideTip, 180); });
+}
+document.addEventListener('focusin', function(e){ if (e.target.classList && e.target.classList.contains('term')) showTip(e.target); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') hideTip(); });
+window.addEventListener('resize', hideTip);
+
+/* ---------- Blocs réutilisables ---------- */
+function tableHtml(t){
+  var h = '<div class="tbl"><table>' + (t.legende ? '<caption>' + esc(t.legende) + '</caption>' : '') + '<thead><tr>';
+  t.entetes.forEach(function(x){ h += '<th scope="col">' + x + '</th>'; });
+  h += '</tr></thead><tbody>';
+  t.lignes.forEach(function(l){
+    h += '<tr>';
+    l.forEach(function(x, i){ h += i === 0 ? '<th scope="row">' + x + '</th>' : '<td data-label="' + esc(String(t.entetes[i]).replace(/<[^>]+>/g, '')) + '">' + x + '</td>'; });
+    h += '</tr>';
+  });
+  return h + '</tbody></table></div>';
+}
+function foldable(label, inner){
+  return '<div class="sub-block"><button class="more-btn" data-fold>' + label + '<span class="chev"></span></button><div class="fold"><div>' + inner + '</div></div></div>';
+}
+function bindFolds(root){ root.querySelectorAll('[data-fold]').forEach(function(b){ b.onclick = function(){ b.parentNode.classList.toggle('open'); }; }); }
+
+/* ---------- Navigation ---------- */
+function renderCrumbs(){
+  var h = '', LBL = {revision: 'Tout réviser', glossaire: 'Glossaire', methodes: 'Méthodes'};
+  if (S.view !== 'home' && S.niveau) h += '<span>/</span><button data-go="home">' + esc(S.niveau.nom) + '</button>';
+  if (S.view === 'partie') h += '<span>/</span><span class="cur">' + esc(S.partie.id) + ' · ' + esc(S.partie.titre) + '</span>';
+  if (LBL[S.view]) h += '<span>/</span><span class="cur">' + LBL[S.view] + '</span>';
+  if (S.view === 'methode') h += '<span>/</span><button data-go="methodes">Méthodes</button>';
+  $('glBtn').classList.toggle('on', S.view === 'glossaire');
+  var home = S.view === 'home';
+  $('backBtn').classList.toggle('show', !home);
+  $('homeBtn').classList.toggle('show', !home);
+  $('brand').classList.toggle('hide', !home);
+  crumbsEl.innerHTML = h;
+  crumbsEl.querySelectorAll('[data-go]').forEach(function(b){ b.onclick = function(){ go(b.dataset.go); }; });
+}
+function goHome(){ if (NIVEAUX.length > 1) S.niveau = null; go('home'); }
+$('brand').onclick = goHome;
+$('homeBtn').onclick = goHome;
+
+/* Historique : le bouton « Retour » et le bouton retour du navigateur
+   ramènent à la page précédente du site */
+/* Le bouton « Retour » du site utilise sa propre liste de pages (HIST) : il fonctionne
+   donc aussi quand le site est intégré dans une autre page (Google Sites), où
+   l'historique du navigateur n'est pas fiable. Le bouton retour du navigateur n'est
+   synchronisé que si le site est ouvert directement. */
+var DANS_CADRE = false;
+try { DANS_CADRE = window.self !== window.top; } catch(e){ DANS_CADRE = true; }
+var HIST = [], USE_HISTORY = !DANS_CADRE, sautPop = 0, sautTimer = null;
+function snap(){ return {view: S.view, niveau: S.niveau, chap: S.chap, partie: S.partie, tab: S.tab, methode: S.methode}; }
+function restore(){
+  var s = HIST.pop();
+  if (s){ S.view = s.view; S.niveau = s.niveau; S.chap = s.chap; S.partie = s.partie; S.tab = s.tab; S.methode = s.methode; } else S.view = 'home';
+  render(); toTop();
+}
+function goBack(){
+  if (!HIST.length){ if (S.view !== 'home'){ S.view = 'home'; render(); toTop(); } return; }
+  restore();
+  /* Recule aussi d'un cran l'historique du navigateur, sans restaurer deux fois */
+  if (USE_HISTORY){
+    sautPop++;
+    clearTimeout(sautTimer); sautTimer = setTimeout(function(){ sautPop = 0; }, 1000);
+    try { history.back(); } catch(e){ sautPop = 0; }
+  }
+}
+$('backBtn').onclick = goBack;
+window.addEventListener('popstate', function(){
+  if (sautPop > 0){ sautPop--; return; }
+  if (HIST.length) restore();
+});
+
+function go(view, opts){
+  opts = opts || {};
+  if (!opts.noPush){
+    HIST.push(snap());
+    if (USE_HISTORY){ try { history.pushState({svt: HIST.length}, ''); } catch(e){ USE_HISTORY = false; } }
+  }
+  S.view = view;
+  if (opts.partie){ S.partie = opts.partie; S.chap = opts.ch; }
+  if (opts.tab) S.tab = opts.tab;
+  if (opts.methode) S.methode = opts.methode;
+  render(); toTop();
+}
+function render(){
+  setKeys(null); hideTip();
+  if (!S.niveau && NIVEAUX.length === 1) S.niveau = NIVEAUX[0];
+  document.body.style.cssText = S.view === 'partie' ? colorVars(chapColor(S.chap)) : (S.view === 'home' ? '' : colorVars(neutre()));
+  renderCrumbs();
+  if (S.view === 'partie') renderPartie();
+  else if (S.view === 'revision') renderRevision();
+  else if (S.view === 'glossaire') renderGlossaire();
+  else if (S.view === 'methodes') renderMethodes();
+  else if (S.view === 'methode') renderMethode();
+  else if (!S.niveau) renderNiveaux();
+  else renderNiveau();
+}
+
+/* ---------- Accueil ---------- */
+function renderNiveaux(){
+  var h = '<div class="view home-head"><p class="kicker">Sciences de la vie et de la Terre</p><h1>Choisis ton niveau</h1></div><div class="parts">';
+  NIVEAUX.forEach(function(n, i){ h += '<button class="part" data-n="' + i + '"><span class="pid"></span><h3>' + esc(n.nom) + '</h3><p class="pq">' + esc(n.intro || '') + '</p></button>'; });
+  app.innerHTML = h + '</div>';
+  app.querySelectorAll('[data-n]').forEach(function(b){ b.onclick = function(){ S.niveau = NIVEAUX[+b.dataset.n]; go('home'); }; });
+}
+
+function renderNiveau(){
+  var n = S.niveau;
+  var h = '<div class="view"><header class="home-head"><p class="kicker" style="color:var(--muted)">Sciences de la vie et de la Terre</p><h1>' + esc(n.nom) + '</h1><p class="lead">' + esc(n.intro || '') + '</p></header>'
+    + '<div class="revise meth-card" id="methCard" role="button" tabindex="0" aria-label="Ouvrir les méthodes"><div><h3><mark class="hl-b">Méthodes</mark></h3><p>Apprendre à rédiger ses réponses, étape par étape.</p></div><span class="btn" aria-hidden="true">Ouvrir</span></div>';
+  n.chapitres.forEach(function(ch){
+    var parts = (ch.parties || []).filter(visible);
+    if (!parts.length) return;
+    h += '<section class="chapter" style="' + colorVars(chapColor(ch)) + '"><div class="ch-head"><p class="kicker">Chapitre ' + ch.num + '</p><h2>' + esc(ch.titre) + '</h2></div><div class="parts">';
+    parts.forEach(function(p){
+      h += '<button class="part" data-p="' + p.id + '"><span class="pid">' + esc(p.id) + '</span><h3>' + esc(p.titre) + '</h3><p class="pq">' + esc(p.problematique || '') + '</p><span class="go">Ouvrir le cours →</span></button>';
+    });
+    h += '</div></section>';
+  });
+  h += '<div class="revise" style="' + colorVars(neutre()) + '"><div><h3>Tout réviser</h3><p>Flashcards et QCM de toutes les parties, mélangés.</p></div><div class="row"><button class="btn" id="rvF">Flashcards</button><button class="btn solid" id="rvQ">QCM</button></div></div>'
+    + '<div class="extras" style="' + colorVars(neutre()) + '"><div class="revise"><div><h3>Glossaire</h3><p>Tous les mots du cours, avec une recherche.</p></div><button class="btn" id="goG">Ouvrir</button></div></div></div>';
+  app.innerHTML = h;
+  $('goG').onclick = function(){ go('glossaire'); };
+  $('methCard').onclick = function(){ go('methodes'); };
+  $('methCard').onkeydown = function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go('methodes'); } };
+  app.querySelectorAll('[data-p]').forEach(function(b){ b.onclick = function(){ var f = findPartie(b.dataset.p); go('partie', {partie: f.p, ch: f.ch, tab: 'essentiel'}); }; });
+  $('rvF').onclick = function(){ go('revision', {tab: 'flashcards'}); };
+  $('rvQ').onclick = function(){ go('revision', {tab: 'qcm'}); };
+}
+
+/* ---------- Page d'une partie ---------- */
+var TABS = [['essentiel', "L'essentiel"], ['activites', 'Activités'], ['flashcards', 'Flashcards'], ['qcm', 'QCM']];
+
+function renderPartie(){
+  var p = S.partie, ch = S.chap;
+  var h = '<div class="view"><header class="hero"><p class="kicker">Chapitre ' + ch.num + ' · Partie ' + esc(p.id) + '</p><h1>' + esc(p.titre) + '</h1>'
+    + '<p class="probl"><span>Problématique</span>' + esc(p.problematique || '') + '</p></header></div>'
+    + '<nav class="tabs" id="tabs">';
+  TABS.forEach(function(t){ h += '<button data-t="' + t[0] + '" class="' + (S.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; });
+  h += '</nav><div id="tab"></div>';
+
+  var list = allParties(S.niveau), idx = -1;
+  list.forEach(function(x, i){ if (x.p.id === p.id) idx = i; });
+  h += '<nav class="next-nav">';
+  if (idx > 0) h += '<button data-nav="' + (idx - 1) + '"><small>← Partie précédente</small><span>' + esc(list[idx - 1].p.id + ' · ' + list[idx - 1].p.titre) + '</span></button>';
+  if (idx < list.length - 1) h += '<button data-nav="' + (idx + 1) + '"><small>Partie suivante →</small><span>' + esc(list[idx + 1].p.id + ' · ' + list[idx + 1].p.titre) + '</span></button>';
+  h += '</nav>';
+  app.innerHTML = h;
+  app.querySelectorAll('#tabs button').forEach(function(b){ b.onclick = function(){ switchTab(b.dataset.t); }; });
+  app.querySelectorAll('[data-nav]').forEach(function(b){ b.onclick = function(){ var x = list[+b.dataset.nav]; go('partie', {partie: x.p, ch: x.ch}); }; });
+  drawTab();
+}
+function switchTab(t, scroll){
+  S.tab = t;
+  app.querySelectorAll('#tabs button').forEach(function(x){ x.classList.toggle('on', x.dataset.t === t); });
+  drawTab();
+  /* Remonte juste au-dessus des onglets (sous l'en-tête de la partie) */
+  if (scroll){
+    var hero = app.querySelector('.hero'), bar = document.querySelector('.topbar');
+    var y = hero ? Math.max(0, hero.getBoundingClientRect().bottom + window.pageYOffset - (bar ? bar.offsetHeight : 52) - 4) : 0;
+    try { window.scrollTo({top: y, behavior: 'smooth'}); } catch(e){ window.scrollTo(0, y); }
+  }
+}
+function drawTab(){
+  var tab = $('tab'), p = S.partie;
+  setKeys(null); hideTip();
+  tab.classList.remove('view'); void tab.offsetWidth; tab.classList.add('view');
+  if (S.tab === 'activites') renderActivites(tab, p);
+  else if (S.tab === 'essentiel') renderEssentiel(tab, p);
+  else if (S.tab === 'flashcards') renderFlashcards(tab, p.flashcards.filter(visible));
+  else renderQcm(tab, p.qcm.filter(visible), 'qcm_' + p.id);
+}
+
+/* ---------- L'essentiel ---------- */
+var ROMAIN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+function renderEssentiel(tab, p){
+  var ess = p.essentiel, h = '';
+  var secs = ess.sections.filter(visible);
+  if (secs.length > 1){
+    h += '<nav class="toc">';
+    secs.forEach(function(s, i){ h += '<button data-sec="' + i + '"><span>' + ROMAIN[i] + '.</span>' + esc(s.titre) + '</button>'; });
+    h += '</nav>';
+  }
+  h += '<p class="hint-line">Les mots <span class="term">soulignés en pointillés</span> ont une définition : ' + (FINE ? 'passe la souris dessus.' : 'touche-les pour l\'afficher.') + ' Tu les retrouves tous dans le glossaire.</p><article class="lesson">';
+  /* Introduction (chiffres + texte), avant les parties numérotées */
+  if (ess.intro){
+    h += '<section id="secIntro"><h2><span>Introduction</span></h2>';
+    var ch = ess.intro.chiffres;
+    if (ch){
+      h += '<div class="aside"><span class="lab">' + esc(ch.titre || 'Quelques chiffres') + '</span><ul class="facts">';
+      ch.lignes.forEach(function(l){ h += '<li>' + rich(l) + '</li>'; });
+      h += '</ul>' + (ch.source ? '<p class="src">Source : ' + esc(ch.source) + '</p>' : '') + '</div>';
+    }
+    (ess.intro.texte || []).forEach(function(t){ h += '<p>' + rich(t) + '</p>'; });
+    h += '</section>';
+  }
+  secs.forEach(function(s, i){
+    h += '<section id="sec' + i + '"><h2><span class="num">' + ROMAIN[i] + '.</span><span>' + esc(s.titre) + '</span></h2>';
+    s.blocs.forEach(function(b){
+      if (typeof b === 'string') h += '<p>' + rich(b) + '</p>';
+      else if (b.table) h += tableHtml(b.table);
+      else if (b.aside) h += '<div class="aside"><span class="lab">' + esc(b.aside) + '</span><p>' + rich(b.texte) + '</p></div>';
+    });
+    h += '</section>';
+  });
+  /* « En résumé » : les bilans du cours, éventuellement avec un titre (Bilan de la séance 1…) */
+  var rcs = Array.isArray(ess.recap) ? ess.recap.filter(visible) : (ess.recap ? [{texte: ess.recap}] : []);
+  if (rcs.length) h += '<div class="recap"><span class="lab">En résumé</span>' + rcs.map(function(b){ return (b.titre ? '<p class="rt">' + esc(b.titre) + '</p>' : '') + '<p>' + rich(b.texte) + '</p>'; }).join('') + '</div>';
+  h += '</article><div class="row" style="margin-top:26px"><button class="btn" id="toF">Réviser avec les flashcards</button><button class="btn solid" id="toQ">Faire le QCM</button></div>';
+  tab.innerHTML = h;
+  tab.querySelectorAll('[data-sec]').forEach(function(b){
+    b.onclick = function(){ var s = $('sec' + b.dataset.sec); try { window.scrollTo({top: s.getBoundingClientRect().top + window.pageYOffset - 110, behavior: 'smooth'}); } catch(e){ s.scrollIntoView(); } };
+  });
+  $('toF').onclick = function(){ switchTab('flashcards', true); };
+  $('toQ').onclick = function(){ switchTab('qcm', true); };
+}
+
+/* ---------- Activités ---------- */
+function renderActivites(tab, p){
+  var h = '';
+  p.activites.filter(visible).forEach(function(a, i){
+    h += '<div class="acc" id="acc' + i + '"><button class="acc-head" data-acc="' + i + '"><span class="t"><span class="type">' + esc(a.type) + '</span><span class="name">' + esc(a.titre) + '</span></span><span class="chev"></span></button>'
+      + '<div class="fold"><div><div class="acc-body"><p class="summary">' + a.resume + '</p>'
+      + (a.conclusion ? '<div class="aside"><span class="lab">' + esc(a.conclusionTitre || 'Conclusion') + '</span><p>' + rich(a.conclusion) + '</p></div>' : '');
+    if (a.lien && a.lien.url) h += '<a class="ext" href="' + esc(a.lien.url) + '" target="_blank" rel="noopener">' + esc(a.lien.texte) + ' ↗</a>';
+    if (AFFICHER_CORRECTIONS && a.correction && a.correction.length){
+      h += '<p class="corr-title">Correction</p>';
+      a.correction.forEach(function(c, k){ h += '<div class="corr-item"><div class="cq"><b>C' + (k + 1) + '</b><span>' + c[0] + '</span></div><p class="ca">' + c[1] + '</p></div>'; });
+    }
+    h += '</div></div></div></div>';
+  });
+  tab.innerHTML = h;
+  tab.querySelectorAll('[data-acc]').forEach(function(b){ b.onclick = function(){ $('acc' + b.dataset.acc).classList.toggle('open'); }; });
+}
+
+/* ---------- Glossaire avec recherche tolérante aux fautes ---------- */
+function lev(a, b, max){
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  var prev = [], cur, i, j;
+  for (j = 0; j <= b.length; j++) prev[j] = j;
+  for (i = 1; i <= a.length; i++){
+    cur = [i]; var best = i;
+    for (j = 1; j <= b.length; j++){
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < best) best = cur[j];
+    }
+    if (best > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function tol(s){ return s.length <= 3 ? 0 : s.length <= 5 ? 1 : s.length <= 8 ? 2 : 3; }
+var GLIST = null;
+function glossList(){
+  if (GLIST) return GLIST;
+  GLIST = Object.keys(GLOSS).map(function(k){
+    var g = GLOSS[k], dn = norm(g.d);
+    return {k: k, g: g, words: k.split(/[^a-z0-9]+/).filter(Boolean), dn: dn, dwords: dn.split(/[^a-z0-9]+/).filter(function(w){ return w.length >= 4; })};
+  }).sort(function(a, b){ return a.k < b.k ? -1 : 1; });
+  return GLIST;
+}
+function searchGloss(q){
+  var qn = norm(q), toks = qn.split(/[^a-z0-9]+/).filter(function(t){ return t.length >= 2; });
+  var toks4 = toks.filter(function(t){ return t.length >= 4; });
+  if (!qn) return {list: glossList(), fuzzy: false};
+  var res = [], fuzzy = true;
+  glossList().forEach(function(e){
+    var s = 0;
+    if (e.k === qn) s = 1000; else if (e.k.indexOf(qn) === 0) s = 600; else if (e.k.indexOf(qn) > -1) s = 400;
+    else if (lev(qn, e.k, tol(qn)) <= tol(qn)) s = 350;
+    if (s) fuzzy = false;
+    if (!s && toks.length){
+      var all = toks.every(function(t){
+        return e.words.some(function(w){ return w.indexOf(t) === 0 || lev(t, w, tol(t)) <= tol(t); });
+      });
+      if (all) s = 250;
+    }
+    if (e.dn.indexOf(qn) > -1){ s += 80; if (s === 80) fuzzy = false; }
+    else if (toks4.length && toks4.every(function(t){ return e.dwords.some(function(w){ return w.indexOf(t) === 0 || lev(t, w, tol(t)) <= tol(t); }); })) s += 40;
+    if (s) res.push({e: e, s: s});
+  });
+  res.sort(function(a, b){ return b.s - a.s || (a.e.k < b.e.k ? -1 : 1); });
+  return {list: res.map(function(r){ return r.e; }), fuzzy: fuzzy && res.length > 0};
+}
+function hl(text, q){
+  var t = esc(text); if (!q || q.length < 2) return t;
+  try { return t.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>'); } catch(e){ return t; }
+}
+function renderGlossaire(){
+  var h = '<div class="view"><header class="hero"><p class="kicker">' + esc(S.niveau.nom) + '</p><h1>Glossaire</h1><p class="probl"><span>Rechercher</span>Tape un mot ou un morceau de définition. Pas de souci si le mot est mal orthographié.</p></header>'
+    + '<input class="gl-search" id="glq" type="search" placeholder="Ex. : tissu, nucléotide, pectine…" autocomplete="off" spellcheck="false" aria-label="Rechercher dans le glossaire"><div class="gl-filters" id="glf"></div><p class="gl-info" id="gli"></p><div id="gll"></div></div>';
+  app.innerHTML = h;
+  var q = $('glq'); q.value = S.glq || '';
+  /* Tri par chapitre, puis par partie du chapitre choisi */
+  var chaps = S.niveau.chapitres.filter(function(ch){ return (ch.parties || []).filter(visible).length; });
+  if (S.glch && !chaps.some(function(ch){ return ch.num === S.glch; })){ S.glch = 0; S.glp = ''; }
+  function drawFilters(){
+    var f = '<div class="chips" role="group" aria-label="Trier par chapitre"><button data-ch="0" class="' + (!S.glch ? 'on' : '') + '">Tous les chapitres</button>';
+    chaps.forEach(function(ch){ f += '<button data-ch="' + ch.num + '" class="' + (S.glch === ch.num ? 'on' : '') + '" title="' + esc(ch.titre) + '">Chapitre ' + ch.num + '</button>'; });
+    f += '</div>';
+    if (S.glch){
+      var ch = chaps.filter(function(c){ return c.num === S.glch; })[0];
+      f += '<p class="gl-chname">' + esc(ch.titre) + '</p><div class="chips small" role="group" aria-label="Trier par partie"><button data-pt="" class="' + (!S.glp ? 'on' : '') + '">Toutes les parties</button>';
+      ch.parties.filter(visible).forEach(function(p){ f += '<button data-pt="' + p.id + '" class="' + (S.glp === p.id ? 'on' : '') + '" title="' + esc(p.titre) + '">' + esc(p.id) + '</button>'; });
+      f += '</div>';
+    }
+    $('glf').innerHTML = f;
+    $('glf').querySelectorAll('[data-ch]').forEach(function(b){ b.onclick = function(){ S.glch = +b.dataset.ch; S.glp = ''; drawFilters(); upd(); }; });
+    $('glf').querySelectorAll('[data-pt]').forEach(function(b){ b.onclick = function(){ S.glp = b.dataset.pt; drawFilters(); upd(); }; });
+  }
+  function upd(){
+    S.glq = q.value;
+    var r = searchGloss(q.value), qt = q.value.trim(), out = '', letter = '';
+    if (S.glch) r.list = r.list.filter(function(e){ return e.g.parts.some(function(x){ return x.ch.num === S.glch && (!S.glp || x.p.id === S.glp); }); });
+    var ou = S.glp ? ' dans la partie ' + S.glp : S.glch ? ' dans le chapitre ' + S.glch : '';
+    $('gli').textContent = !qt ? r.list.length + ' mot' + (r.list.length > 1 ? 's' : '') + (ou || ' dans le glossaire') : !r.list.length ? 'Aucun résultat pour « ' + qt + ' »' + ou + '.' : (r.fuzzy ? 'Résultats approchants pour « ' + qt + ' » : ' : '') + r.list.length + ' résultat' + (r.list.length > 1 ? 's' : '') + ou;
+    r.list.forEach(function(e){
+      if (!qt){ var L = e.k.charAt(0).toUpperCase(); if (L !== letter){ letter = L; out += '<div class="gl-letter">' + L + '</div>'; } }
+      out += '<div class="gl-item"><h3>' + hl(e.g.t, qt) + '</h3><p>' + hl(e.g.d, qt) + '</p>';
+      if (e.g.parts.length){ out += '<div class="gl-tags">'; e.g.parts.forEach(function(x){ out += '<button style="' + colorVars(chapColor(x.ch)) + '" data-gp="' + x.p.id + '">' + esc(x.p.id) + ' · ' + esc(x.p.titre) + '</button>'; }); out += '</div>'; }
+      out += '</div>';
+    });
+    $('gll').innerHTML = out;
+    $('gll').querySelectorAll('[data-gp]').forEach(function(b){ b.onclick = function(){ var f = findPartie(b.dataset.gp); go('partie', {partie: f.p, ch: f.ch, tab: 'essentiel'}); }; });
+  }
+  q.oninput = upd; drawFilters(); upd();
+  if (FINE) q.focus();
+}
+
+/* ---------- Réglages de lecture ---------- */
+/* Par défaut : taille normale, police Lexend, espacement normal, thème papier */
+var REG = {taille: 1, police: 'lex', espace: 'n', theme: 'papier'};
+try { var r0 = JSON.parse(localStorage.getItem('svt2nde_reglages_v2')); if (r0) for (var k0 in r0) REG[k0] = r0[k0]; } catch(e){}
+var TAILLES = ['93.75%', '100%', '112.5%', '125%'];
+function applyReg(){
+  var r = document.documentElement;
+  r.style.fontSize = TAILLES[REG.taille] || '100%';
+  r.classList.toggle('f-lex', REG.police === 'lex');
+  r.classList.toggle('sp-wide', REG.espace === 'w');
+  r.classList.toggle('th-clair', REG.theme === 'clair');
+  r.classList.toggle('th-sombre', REG.theme === 'sombre');
+  try { localStorage.setItem('svt2nde_reglages_v2', JSON.stringify(REG)); } catch(e){}
+}
+function pillRow(label, key, opts){
+  var h = '<p class="set-label">' + label + '</p><div class="pills">';
+  opts.forEach(function(o){ h += '<button data-set="' + key + '" data-val="' + o[0] + '" class="' + (String(REG[key]) === String(o[0]) ? 'on' : '') + '"' + (o[2] ? ' style="' + o[2] + '"' : '') + '>' + o[1] + '</button>'; });
+  return h + '</div>';
+}
+function drawSettings(){
+  var s = $('settings');
+  s.innerHTML = pillRow('Thème', 'theme', [['papier', 'Vert'], ['clair', 'Clair'], ['sombre', 'Sombre']])
+    + pillRow('Taille du texte', 'taille', [[0, 'A−', 'font-size:.78rem'], [1, 'A', 'font-size:.86rem'], [2, 'A+', 'font-size:.96rem'], [3, 'A++', 'font-size:1.06rem']])
+    + pillRow('Police', 'police', [['lex', 'Lexend'], ['std', 'Classique']])
+    + pillRow('Espacement', 'espace', [['n', 'Normal'], ['w', 'Élargi']])
+    + '<p class="note">Lexend est une police conçue pour faciliter la lecture. L\'espacement élargi ajoute de l\'espace entre les lettres, les mots et les lignes, et aligne le texte à gauche (utile en cas de dyslexie).</p>';
+  s.querySelectorAll('[data-set]').forEach(function(b){
+    b.onclick = function(){
+      var key = b.dataset.set, v = b.dataset.val;
+      REG[key] = key === 'taille' ? +v : v;
+      applyReg();
+      if (key === 'theme') render();
+      drawSettings();
+    };
+  });
+}
+function toggleSettings(show){
+  var s = $('settings'), on = show === undefined ? !s.classList.contains('show') : show;
+  if (on) drawSettings();
+  s.classList.toggle('show', on); $('setBtn').classList.toggle('on', on); $('setBtn').setAttribute('aria-expanded', on);
+}
+$('setBtn').onclick = function(e){ e.stopPropagation(); hideTip(); toggleSettings(); };
+$('glBtn').onclick = function(){ toggleSettings(false); go('glossaire'); };
+document.addEventListener('click', function(e){ if ($('settings').classList.contains('show') && !$('settings').contains(e.target)) toggleSettings(false); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') toggleSettings(false); });
+applyReg();
+
+/* ---------- Tuto (s'ouvre uniquement avec le bouton « Tuto ») ---------- */
+var TUTO = [
+ {t: "Bienvenue !", h: "<p>Ce site accompagne le cours de SVT de seconde. Chaque partie du cahier (1a, 1b, 1c…) a sa propre page, avec le cours, les corrections des activités et des outils pour réviser.</p><p>Ce tuto présente en quelques étapes comment le site est organisé et ce que tu peux y faire. Tu peux le rouvrir à tout moment avec le bouton <b>Tuto</b>, en haut de l'écran.</p>"},
+ {t: "L'organisation du site", h: "<ul><li>L'<b>accueil</b> présente les chapitres. Chaque chapitre a sa couleur et contient ses parties, avec leur problématique.</li><li>Clique sur une partie pour ouvrir son cours.</li><li>En haut de l'accueil, la carte bleue <b>Méthodes</b> rassemble des fiches pour apprendre à rédiger tes réponses : les étapes, un exemple rédigé et les erreurs à éviter.</li><li>En haut, <b>← Retour</b> ramène à la page précédente et <b>Accueil</b> à la liste des chapitres.</li><li>En bas de chaque partie, tu peux passer directement à la <b>partie précédente</b> ou à la <b>partie suivante</b>.</li></ul>"},
+ {t: "Les quatre onglets d'une partie", h: "<div class=\"tuto-demo\"><span>L'essentiel</span><span>Activités</span><span>Flashcards</span><span>QCM</span></div><ul><li><b>L'essentiel</b> : le cours rédigé, avec un sommaire (I, II, III…), des tableaux et, à la fin, l'encadré <b>En résumé</b> qui reprend les bilans de ton cahier.</li><li><b>Activités</b> : pour chaque activité ou TP, un résumé, la conclusion et la correction question par question (C1, C2…). Touche le titre pour l'ouvrir.</li><li><b>Flashcards</b> et <b>QCM</b> : pour réviser, voir les étapes suivantes.</li></ul>"},
+ {t: "Les mots du cours et le glossaire", h: "<div class=\"tuto-demo\"><span class=\"dterm\">matrice extracellulaire</span></div><ul><li>Dans le cours, les mots <b>soulignés en pointillés</b> ont une définition : passe la souris dessus ou touche-les pour l'afficher.</li><li>Le bouton <b>Glossaire</b>, en haut, rassemble tous les mots du cours, classés par ordre alphabétique.</li><li>La recherche du glossaire accepte les petites fautes d'orthographe, et chaque mot indique les parties où il est utilisé.</li></ul>"},
+ {t: "Réviser avec les flashcards", h: "<ul><li>Chaque carte a un mot-clé d'un côté et sa définition de l'autre. <b>Touche la carte</b> (ou appuie sur Espace) pour la retourner.</li><li>Réponds honnêtement avec <b>Je savais</b> ou <b>À revoir</b> : à la fin, tu vois ton score et tu peux revoir seulement les cartes ratées.</li><li><b>Une par une</b> ou <b>Toutes</b> : une carte à la fois, ou toutes les cartes affichées d'un coup.</li><li><b>Mot d'abord</b> ou <b>Définition d'abord</b> : pour t'entraîner dans les deux sens.</li><li>Pour changer de carte, fais glisser ton doigt ou utilise les flèches.</li></ul>"},
+ {t: "S'entraîner avec les QCM", h: "<ul><li>Choisis un <b>niveau</b> (facile, moyen, difficile ou tous) et le <b>nombre de questions</b>.</li><li>Après chaque réponse, une <b>explication</b> s'affiche, que tu aies juste ou non.</li><li>Les questions et les réponses sont mélangées à chaque essai.</li><li>À la fin, tu peux revoir tes erreurs. Ton <b>meilleur score</b> est gardé sur ton appareil.</li><li>Sur l'accueil, <b>Tout réviser</b> mélange les flashcards et les QCM de toutes les parties : idéal avant un contrôle.</li></ul>"},
+ {t: "Adapter l'affichage", h: "<p>Le bouton <b>Aa</b>, en haut à droite, permet de régler la lecture selon tes besoins :</p><ul><li><b>Thème</b> : vert, clair ou sombre.</li><li><b>Taille du texte</b> : de A− à A++.</li><li><b>Police</b> : Lexend, conçue pour faciliter la lecture, ou une police classique.</li><li><b>Espacement élargi</b> : plus d'espace entre les lettres, les mots et les lignes (utile en cas de dyslexie).</li></ul><p>Tes réglages sont gardés pour tes prochaines visites.</p>"},
+ {t: "Comment bien réviser ?", h: "<ul><li><b>1.</b> Lis <b>L'essentiel</b> et vérifie que tu comprends les mots soulignés.</li><li><b>2.</b> Relis les corrections des <b>Activités</b> que tu n'as pas réussies.</li><li><b>3.</b> Fais les <b>flashcards</b> jusqu'à ne plus avoir de carte à revoir.</li><li><b>4.</b> Termine par le <b>QCM</b>, du niveau facile au niveau difficile.</li></ul><p>Bon travail !</p>"}
+];
+var tutoI = 0, tutoFocus = null;
+function drawTuto(){
+  var s = TUTO[tutoI], last = tutoI === TUTO.length - 1;
+  $('tutoBody').innerHTML = '<div class="tuto-step"><p class="kicker">Tuto · Étape ' + (tutoI + 1) + ' sur ' + TUTO.length + '</p><h2>' + s.t + '</h2>' + s.h + '</div>';
+  $('tutoBody').scrollTop = 0;
+  var d = '';
+  TUTO.forEach(function(x, k){ d += '<button class="' + (k === tutoI ? 'on' : '') + '" data-k="' + k + '" aria-label="Étape ' + (k + 1) + '"></button>'; });
+  $('tutoDots').innerHTML = d;
+  $('tutoDots').querySelectorAll('button').forEach(function(b){ b.onclick = function(){ tutoI = +b.dataset.k; drawTuto(); }; });
+  $('tutoPrev').style.visibility = tutoI ? 'visible' : 'hidden';
+  $('tutoNext').textContent = last ? "C'est parti !" : 'Suivant →';
+}
+function openTuto(){
+  hideTip(); toggleSettings(false);
+  tutoFocus = document.activeElement; tutoI = 0; drawTuto();
+  $('tuto').classList.add('show'); document.body.style.overflow = 'hidden';
+  $('tutoNext').focus();
+}
+function closeTuto(){
+  $('tuto').classList.remove('show'); document.body.style.overflow = '';
+  if (tutoFocus && tutoFocus.focus) tutoFocus.focus();
+}
+$('tutoBtn').onclick = function(e){ e.stopPropagation(); openTuto(); };
+$('tutoX').onclick = closeTuto;
+$('tutoPrev').onclick = function(){ if (tutoI > 0){ tutoI--; drawTuto(); } };
+$('tutoNext').onclick = function(){ if (tutoI < TUTO.length - 1){ tutoI++; drawTuto(); } else closeTuto(); };
+$('tuto').addEventListener('click', function(e){ if (e.target === $('tuto')) closeTuto(); });
+document.addEventListener('keydown', function(e){
+  if (!$('tuto').classList.contains('show')) return;
+  e.stopImmediatePropagation();
+  if (e.key === 'Escape') closeTuto();
+  else if (e.key === 'ArrowRight' && tutoI < TUTO.length - 1){ tutoI++; drawTuto(); }
+  else if (e.key === 'ArrowLeft' && tutoI > 0){ tutoI--; drawTuto(); }
+}, true);
+
+/* ---------- Méthodes ----------
+   Pour ajouter une méthode : copier un bloc de METHODES.
+   {{v:…}} = ce que je fais (surligné jaune), {{e:…}} = ce que j'écris (surligné vert).
+   cache: true masque une méthode. */
+var METHODES = [
+ {id: "comprendre", titre: "Comprendre une consigne",
+  enBref: "Avant de répondre, je prends une minute pour savoir exactement ce qu'on me demande.",
+  etapes: [
+   {titre: "Je lis tout", texte: "Je lis la consigne {{e:en entier}}, jusqu'au bout, avant de commencer."},
+   {titre: "J'encadre le verbe", texte: "Le {{v:verbe d'action}} me dit quoi faire : décrire, comparer, expliquer…"},
+   {titre: "Je surligne les mots clés", texte: "Je repère {{e:de quoi on parle}} et {{e:les contraintes}} : quel document, combien de lignes, schéma ou texte."},
+   {titre: "Je reformule", texte: "Je me dis la consigne {{e:avec mes mots}} : « Je dois… »."},
+   {titre: "Je vérifie", texte: "À la fin, je relis la consigne : ai-je fait {{e:tout}} ce qui était demandé ?"}
+  ],
+  exemple: {
+   titre: "Exemple",
+   lignes: [
+    ["Consigne", "{{v:Comparer}} {{e:la fibre musculaire et le neurone}}, {{e:en 5 lignes maximum}}."],
+    ["Je reformule", "Je dois donner les points communs et les différences entre ces deux cellules, en 5 lignes au plus."]
+   ]
+  },
+  reperes: {titre: "Les verbes les plus fréquents", lignes: [
+   ["Décrire", "dire ce que je vois, avec des valeurs."],
+   ["Comparer", "donner les points communs et les différences."],
+   ["Expliquer", "donner la cause : « parce que… »."],
+   ["Justifier", "donner la preuve, tirée du document."],
+   ["En déduire", "conclure à partir de ce qui précède : « donc… »."]
+  ]}
+ },
+ {id: "consigne", titre: "Répondre à une consigne à partir de documents",
+  enBref: "Une réponse construite en trois temps : ce que je vois dans les documents, ce que je sais, ce que j'en conclus.",
+  etapes: [
+   {titre: "J'identifie", fais: "J'{{v:identifie}} dans les documents les informations utiles pour répondre, en citant des valeurs précises.", ecris: "{{e:Je constate que}}… / {{e:Le document 1 montre que}}…"},
+   {titre: "Je confronte", facultatif: true, fais: "Je {{v:confronte}} ces informations à celles d'un autre document ou à mes connaissances.", ecris: "{{e:Or}} on sait que… / {{e:Or}} le document 2 montre que…"},
+   {titre: "Je réponds", fais: "Je {{v:réponds}} à la question posée, en m'appuyant sur ce qui précède.", ecris: "{{e:Donc}}…"}
+  ],
+  exemple: {
+   partie: "1b",
+   consigne: "À partir des documents, montrer que les pectines participent à l'adhérence entre les cellules végétales.",
+   document: "Document 1 : des chercheurs comparent des plantes normales à des plantes mutantes dont la production de certaines pectines est perturbée. Document 2 : entre les parois de deux cellules voisines se trouve la lamelle moyenne, particulièrement riche en pectines.",
+   reponse: [
+    "{{e:Le document 1 montre que}}, chez les plantes normales, les cellules voisines restent **jointives**, alors que chez les mutants, qui produisent moins de pectines, **des espaces apparaissent** entre certaines cellules.",
+    "{{e:Or}} le document 2 montre que les pectines sont surtout présentes dans la **lamelle moyenne**, située entre deux cellules voisines.",
+    "{{e:Donc}} **les pectines participent à l'adhérence entre les cellules** : sans elles, les cellules se séparent plus facilement."
+   ]
+  },
+  erreurs: [
+   "**Recopier tout le document** : je ne garde que les informations utiles pour répondre à la question.",
+   "**Oublier les valeurs** : je cite des données précises, avec leurs unités.",
+   "**Conclure sans preuve** : chaque conclusion s'appuie sur ce que j'ai constaté.",
+   "**Oublier de conclure** : le « Donc » répond exactement à la question posée."
+  ]
+ }
+];
+function mfmt(s){
+  return rich(esc(s).replace(/\{\{v:(.+?)\}\}/g, '<mark class="hl-v">$1</mark>').replace(/\{\{e:(.+?)\}\}/g, '<mark class="hl-e">$1</mark>'));
+}
+function renderMethodes(){
+  var h = '<div class="view"><header class="hero"><p class="kicker">Savoir-faire</p><h1>Méthodes</h1><p class="probl"><span>En bref</span>Des fiches pour apprendre à rédiger tes réponses en SVT, étape par étape.</p></header><div class="parts">';
+  METHODES.filter(visible).forEach(function(m, i){
+    h += '<button class="part nonum" data-m="' + m.id + '"><h3>' + esc(m.titre) + '</h3><p class="pq">' + esc(m.enBref) + '</p><span class="go">Ouvrir la fiche →</span></button>';
+  });
+  app.innerHTML = h + '</div></div>';
+  app.querySelectorAll('[data-m]').forEach(function(b){ b.onclick = function(){ go('methode', {methode: b.dataset.m}); }; });
+}
+function renderMethode(){
+  var m = METHODES.filter(function(x){ return x.id === S.methode; })[0];
+  if (!m){ renderMethodes(); return; }
+  var h = '<div class="view"><header class="hero"><p class="kicker">Méthode</p><h1>' + esc(m.titre) + '</h1><p class="probl"><span>En bref</span>' + esc(m.enBref) + '</p></header>'
+    + '<p class="kicker" style="margin-top:6px">Les étapes</p><ol class="m-steps">';
+  m.etapes.forEach(function(e){
+    h += '<li><h3>' + esc(e.titre) + (e.facultatif ? ' <span class="m-opt">facultatif</span>' : '') + '</h3>';
+    if (e.texte){ h += '<p>' + mfmt(e.texte) + '</p></li>'; return; }
+    h += '<p><span class="m-lab">Ce que je fais</span>' + mfmt(e.fais) + '</p>'
+      + '<p><span class="m-lab">Ce que j\'écris</span>' + mfmt(e.ecris) + '</p></li>';
+  });
+  h += '</ol>';
+  if (m.exemple){
+    var x = m.exemple;
+    h += '<p class="kicker">' + esc(x.titre || 'Exemple rédigé') + (x.partie ? ' (partie ' + esc(x.partie) + ')' : '') + '</p><div class="m-ex">';
+    if (x.lignes) h += x.lignes.map(function(l){ return '<p><span class="m-lab">' + esc(l[0]) + '</span>' + mfmt(l[1]) + '</p>'; }).join('') + '</div>';
+    else h += '<p><span class="m-lab">Consigne</span>' + mfmt(x.consigne) + '</p>'
+      + '<p><span class="m-lab">Document</span>' + mfmt(x.document) + '</p>'
+      + '<div class="m-rep"><span class="m-lab">Réponse</span>' + x.reponse.map(function(r){ return '<p>' + mfmt(r) + '</p>'; }).join('') + '</div></div>';
+  }
+  if (m.reperes){
+    h += '<p class="kicker">' + esc(m.reperes.titre) + '</p><ul class="m-err">' + m.reperes.lignes.map(function(l){ return '<li><mark class="hl-v">' + esc(l[0]) + '</mark> : ' + mfmt(l[1]) + '</li>'; }).join('') + '</ul>';
+  }
+  if (m.erreurs && m.erreurs.length){
+    h += '<p class="kicker">Erreurs fréquentes</p><ul class="m-err">' + m.erreurs.map(function(r){ return '<li>' + mfmt(r) + '</li>'; }).join('') + '</ul>';
+  }
+  h += '<div class="row" style="margin-top:22px"><button class="btn" id="mList">Toutes les méthodes</button></div></div>';
+  app.innerHTML = h;
+  $('mList').onclick = function(){ go('methodes'); };
+}
+
+/* ---------- Tout réviser ---------- */
+function renderRevision(){
+  var fc = [], q = [];
+  allParties(S.niveau).forEach(function(x){
+    var col = chapColor(x.ch);
+    x.p.flashcards.filter(visible).forEach(function(c){ fc.push({t: c[0], d: c[1], col: col, tag: x.p.id}); });
+    x.p.qcm.filter(visible).forEach(function(it){ q.push({q: it.q, o: it.o, r: it.r, e: it.e, n: it.n, col: col, tag: x.p.id}); });
+  });
+  var h = '<div class="view"><header class="hero"><p class="kicker">' + esc(S.niveau.nom) + '</p><h1>Tout réviser</h1><p class="probl"><span>Mode révision</span>Toutes les parties sont mélangées.</p></header></div>'
+    + '<nav class="tabs" id="tabs"><button data-t="flashcards" class="' + (S.tab === 'flashcards' ? 'on' : '') + '">Flashcards</button><button data-t="qcm" class="' + (S.tab === 'qcm' ? 'on' : '') + '">QCM</button></nav><div id="tab"></div>';
+  app.innerHTML = h;
+  function draw(){ var tab = $('tab'); setKeys(null); if (S.tab === 'flashcards') renderFlashcards(tab, fc); else renderQcm(tab, q, 'qcm_tout_' + S.niveau.id); }
+  app.querySelectorAll('#tabs button').forEach(function(b){ b.onclick = function(){ S.tab = b.dataset.t; app.querySelectorAll('#tabs button').forEach(function(x){ x.classList.toggle('on', x === b); }); draw(); }; });
+  draw();
+}
+
+/* ---------- Flashcards ---------- */
+function renderFlashcards(tab, cards){
+  cards = cards.map(function(c){ return Array.isArray(c) ? {t: c[0], d: c[1]} : c; });
+  var mode = 'jeu', sens = 'mot', deck, idx, known, review, dir = 1;
+  function reset(list){ deck = shuffle(list || cards); idx = 0; known = 0; review = []; dir = 1; }
+  reset();
+
+  function faces(c, small){
+    var term = '<div class="term-big">' + esc(c.t) + '</div>', def = '<div class="def">' + esc(c.d) + '</div>';
+    var f = sens === 'mot' ? [term, def, 'Mot-clé', 'Définition'] : [def, term, 'Définition', 'Mot-clé'];
+    var tag = c.tag ? '<span class="code">' + esc(c.tag) + '</span>' : '';
+    return '<div class="face front"><span class="lab">' + f[2] + '</span>' + tag + f[0] + (small ? '' : '<span class="hint">Touche la carte pour la retourner</span>') + '</div>'
+         + '<div class="face back"><span class="lab">' + f[3] + '</span>' + tag + f[1] + '</div>';
+  }
+  function cstyle(c){ return c.col ? ' style="' + colorVars(c.col) + '"' : ''; }
+
+  function draw(){
+    var h = '<div class="fc-tools"><div class="pills"><button data-m="jeu" class="' + (mode === 'jeu' ? 'on' : '') + '">Une par une</button><button data-m="liste" class="' + (mode === 'liste' ? 'on' : '') + '">Toutes</button></div>'
+      + '<div class="pills"><button data-s="mot" class="' + (sens === 'mot' ? 'on' : '') + '">Mot d\'abord</button><button data-s="def" class="' + (sens === 'def' ? 'on' : '') + '">Définition d\'abord</button></div></div>';
+    if (mode === 'liste'){
+      h += '<div class="fc-grid">';
+      cards.forEach(function(c){ h += '<div class="scene"' + cstyle(c) + '><div class="flash">' + faces(c, true) + '</div></div>'; });
+      h += '</div>';
+      setKeys(null);
+    } else if (idx >= deck.length){
+      h += '<div class="done"><div class="big">' + known + ' / ' + deck.length + '</div><p>cartes connues</p>'
+        + (review.length ? '<p>' + review.length + ' carte' + (review.length > 1 ? 's' : '') + ' à revoir.</p>' : '<p>Parfait, tu connais tout !</p>')
+        + '<div class="row">' + (review.length ? '<button class="btn solid" id="again">Revoir les cartes ratées</button>' : '') + '<button class="btn" id="restart">Recommencer</button></div></div>';
+      setKeys(null);
+    } else {
+      var c = deck[idx];
+      h += '<div class="bar"><i style="width:' + (idx / deck.length * 100) + '%"></i></div>'
+        + '<div class="scene" id="scene"' + cstyle(c) + '><div class="flash ' + (dir > 0 ? 'in' : 'in-back') + '" id="card">' + faces(c) + '</div></div>'
+        + '<div class="fc-count">Carte ' + (idx + 1) + ' sur ' + deck.length + '</div>'
+        + '<div class="fc-know"><button class="btn no" id="no">À revoir</button><button class="btn yes" id="yes">Je savais</button></div>'
+        + '<div class="fc-ctrl"><button class="btn arrow" id="prev" aria-label="Carte précédente">‹</button><button class="btn" id="mix">Mélanger</button><button class="btn arrow" id="next" aria-label="Carte suivante">›</button></div>';
+    }
+    tab.innerHTML = h;
+    tab.querySelectorAll('[data-m]').forEach(function(b){ b.onclick = function(){ mode = b.dataset.m; draw(); }; });
+    tab.querySelectorAll('[data-s]').forEach(function(b){ b.onclick = function(){ sens = b.dataset.s; draw(); }; });
+    tab.querySelectorAll('.flash').forEach(function(f){ f.onclick = function(){ f.classList.remove('in', 'in-back'); f.classList.toggle('flipped'); }; });
+    if ($('again')) $('again').onclick = function(){ reset(review); draw(); };
+    if ($('restart')) $('restart').onclick = function(){ reset(); draw(); };
+    if (!$('card')) return;
+    function next(){ if (idx < deck.length - 1){ idx++; dir = 1; draw(); } }
+    function prev(){ if (idx > 0){ idx--; dir = -1; draw(); } }
+    function flip(){ var f = $('card'); f.classList.remove('in', 'in-back'); f.classList.toggle('flipped'); }
+    $('next').onclick = next; $('prev').onclick = prev;
+    $('mix').onclick = function(){ reset(); draw(); };
+    $('yes').onclick = function(){ known++; idx++; dir = 1; draw(); };
+    $('no').onclick = function(){ review.push(deck[idx]); idx++; dir = 1; draw(); };
+    var sx = null, sy = null, sc = $('scene');
+    sc.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive: true});
+    sc.addEventListener('touchend', function(e){
+      if (sx === null) return;
+      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5){ e.preventDefault(); if (dx < 0) next(); else prev(); }
+    });
+    setKeys(function(e){
+      if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+      if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); flip(); }
+      else if (e.key === 'ArrowRight') next();
+      else if (e.key === 'ArrowLeft') prev();
+    });
+  }
+  draw();
+}
+
+/* ---------- QCM ---------- */
+function renderQcm(tab, bank, key){
+  bank = bank.map(function(q){ return {q: q.q, o: q.o, r: q.r, e: q.e, n: q.n || 2, col: q.col, tag: q.tag}; });
+  var lvl = 0, nb = 10, qs, i, score, answers;
+  function pool(){ return lvl ? bank.filter(function(q){ return q.n === lvl; }) : bank; }
+
+  function start(list){
+    qs = list.map(function(q){
+      var order = shuffle(q.o.map(function(_, k){ return k; }));
+      return {q: q.q, o: order.map(function(k){ return q.o[k]; }), r: order.indexOf(q.r), e: q.e, n: q.n, col: q.col, tag: q.tag};
+    });
+    i = 0; score = 0; answers = []; draw();
+  }
+  function intro(){
+    var pl = pool(), best = store(key + '_' + lvl);
+    var counts = {0: bank.length, 1: 0, 2: 0, 3: 0};
+    bank.forEach(function(q){ counts[q.n]++; });
+    var opts = [5, 10, 20].filter(function(v){ return v < pl.length; }).concat([pl.length]);
+    if (opts.indexOf(nb) < 0) nb = opts[Math.min(1, opts.length - 1)];
+    var h = '<div class="panel"><h3>QCM</h3><p class="muted" style="margin:0">Questions et réponses mélangées à chaque essai.</p>'
+      + '<p class="set-label">Niveau</p><div class="chips" id="lv">';
+    [0, 1, 2, 3].forEach(function(l){ h += '<button data-l="' + l + '" class="' + (lvl === l ? 'on' : '') + '"' + (counts[l] ? '' : ' disabled') + '>' + (l ? NIVEAUX_LBL[l] : 'Tous niveaux') + '<small>' + counts[l] + '</small></button>'; });
+    h += '</div><p class="set-label">Nombre de questions</p><div class="chips" id="nbq">';
+    opts.forEach(function(v){ h += '<button data-v="' + v + '" class="' + (v === nb ? 'on' : '') + '">' + (v === pl.length ? 'Toutes (' + v + ')' : v) + '</button>'; });
+    h += '</div><div class="row" style="justify-content:space-between;margin-top:22px"><button class="btn solid" id="go">Commencer</button>' + (best ? '<span class="muted">Meilleur score : ' + best + ' %</span>' : '') + '</div></div>';
+    tab.innerHTML = h;
+    tab.querySelectorAll('#lv button').forEach(function(b){ b.onclick = function(){ lvl = +b.dataset.l; intro(); }; });
+    tab.querySelectorAll('#nbq button').forEach(function(b){ b.onclick = function(){ nb = +b.dataset.v; tab.querySelectorAll('#nbq button').forEach(function(x){ x.classList.toggle('on', x === b); }); }; });
+    $('go').onclick = function(){ start(shuffle(pool()).slice(0, nb)); };
+  }
+  function draw(){
+    if (i >= qs.length) return end();
+    var q = qs[i];
+    var h = '<div class="panel view"' + (q.col ? ' style="' + colorVars(q.col) + '"' : '') + '><div class="q-meta"><span>Question ' + (i + 1) + ' / ' + qs.length + (q.tag ? ' · ' + esc(q.tag) : '') + '</span><span class="lvl">' + NIVEAUX_LBL[q.n] + '</span></div>'
+      + '<div class="bar" style="max-width:none"><i style="width:' + (i / qs.length * 100) + '%"></i></div>'
+      + '<div class="q-text">' + esc(q.q) + '</div><div class="opts">';
+    q.o.forEach(function(o, k){ h += '<button class="opt" data-k="' + k + '"><span class="k">' + 'ABCD'[k] + '</span><span>' + esc(o) + '</span></button>'; });
+    h += '</div><div id="fb"></div></div>';
+    tab.innerHTML = h;
+    tab.querySelectorAll('.opt').forEach(function(b){
+      b.onclick = function(){
+        var k = +b.dataset.k, ok = k === q.r;
+        if (ok) score++;
+        answers.push({q: q, choix: k, ok: ok});
+        tab.querySelectorAll('.opt').forEach(function(x){
+          x.disabled = true;
+          var xk = +x.dataset.k;
+          if (xk === q.r) x.classList.add('good'); else if (xk === k) x.classList.add('bad'); else x.classList.add('dim');
+        });
+        $('fb').innerHTML = '<div class="feedback ' + (ok ? 'ok' : 'ko') + '"><b>' + (ok ? 'Bonne réponse' : 'Pas tout à fait') + '</b>' + esc(q.e || '') + '</div>'
+          + '<div class="q-next"><button class="btn solid" id="nx">' + (i === qs.length - 1 ? 'Voir mon score' : 'Question suivante') + '</button></div>';
+        $('nx').onclick = function(){ i++; draw(); };
+        setKeys(function(e){ if (e.key === 'Enter'){ e.preventDefault(); setKeys(null); i++; draw(); } });
+      };
+    });
+  }
+  function end(){
+    setKeys(null);
+    var pct = Math.round(score / qs.length * 100), bk = key + '_' + lvl;
+    if (pct > (store(bk) || 0)) store(bk, pct);
+    var msg = pct >= 90 ? 'Excellent !' : pct >= 70 ? 'Très bien, continue.' : pct >= 50 ? 'Pas mal, revois les points ratés.' : "Relis L'essentiel et les flashcards, puis réessaie.";
+    var wrong = answers.filter(function(a){ return !a.ok; });
+    var det = '';
+    answers.forEach(function(a, n){
+      det += '<div class="review-item"><div><b>' + (n + 1) + '.</b> ' + esc(a.q.q) + '</div>'
+        + (a.ok ? '<div class="r-ok">✓ ' + esc(a.q.o[a.choix]) + '</div>'
+                : '<div class="r-ko">✗ ' + esc(a.q.o[a.choix]) + '</div><div class="r-ok">✓ ' + esc(a.q.o[a.q.r]) + '</div>')
+        + '<div class="muted">' + esc(a.q.e || '') + '</div></div>';
+    });
+    var h = '<div class="panel view center"><div class="score">' + score + ' / ' + qs.length + '</div><p class="muted" style="margin:0">' + pct + ' % · ' + msg + '</p>'
+      + '<div class="row" style="justify-content:center;margin:20px 0 10px">' + (wrong.length ? '<button class="btn solid" id="redo">Refaire les ' + wrong.length + ' ratée' + (wrong.length > 1 ? 's' : '') + '</button>' : '') + '<button class="btn" id="again">Nouveau QCM</button></div>'
+      + '<div style="text-align:left">' + foldable('Voir la correction détaillée', det) + '</div></div>';
+    tab.innerHTML = h;
+    bindFolds(tab);
+    if ($('redo')) $('redo').onclick = function(){ start(wrong.map(function(a){ return a.q; })); };
+    $('again').onclick = intro;
+  }
+  intro();
+}
+
+/* ---------- Halloween : toiles dans les coins et citrouilles ----------
+   Pour l'enlever après la période : mettre  HALLOWEEN = false  tout en haut du script. */
+if (HALLOWEEN) (function(){
+  document.documentElement.classList.add('hw');
+  var PUMP = '<span class="hw-p" aria-hidden="true"><svg viewBox="0 0 64 60"><path d="M29 13c0-6 2-9 7-11l3 4c-3 1-4 3-4 7z" fill="#5b7a2e"/><ellipse cx="18" cy="36" rx="14" ry="18" fill="#e2771a"/><ellipse cx="46" cy="36" rx="14" ry="18" fill="#e2771a"/><ellipse cx="32" cy="36" rx="16" ry="21" fill="#f08a24"/><path class="pf" d="M17 31l5-8 5 8zM37 31l5-8 5 8zM15 40q17 15 34 0l-5 1-3-3-4 4-5-4-5 4-4-4-3 3z"/></svg></span>';
+  /* Toile d'araignée (sans araignée) : rayons + fils en arc, depuis le coin */
+  function web(){
+    var R = 120, n = 4, d = '', i, k;
+    function pt(r, a){ return (r * Math.cos(a)).toFixed(1) + ' ' + (r * Math.sin(a)).toFixed(1); }
+    for (i = 0; i <= n; i++) d += 'M0 0L' + pt(R, i * Math.PI / 2 / n);
+    [26, 50, 76, 104].forEach(function(r){
+      for (k = 0; k < n; k++){ var a = k * Math.PI / 2 / n, b = (k + 1) * Math.PI / 2 / n; d += 'M' + pt(r, a) + 'Q' + pt(r * .8, (a + b) / 2) + ' ' + pt(r, b); }
+    });
+    return '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><path d="' + d + '"/></svg>';
+  }
+  var main = document.querySelector('main');
+  ['l', 'r'].forEach(function(c){ var w = document.createElement('div'); w.className = 'hw-web ' + c; w.setAttribute('aria-hidden', 'true'); w.innerHTML = web(); main.insertBefore(w, main.firstChild); });
+  $('brand').insertAdjacentHTML('beforeend', PUMP);
+  document.querySelector('.foot .wrap').insertAdjacentHTML('afterbegin', PUMP);
+  /* Pluie de citrouilles : elles tombent du haut de l'écran puis disparaissent */
+  function rain(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var box = document.createElement('div'), h = '', n = window.innerWidth < 560 ? 22 : 36, i;
+    box.className = 'hw-rain'; box.setAttribute('aria-hidden', 'true');
+    for (i = 0; i < n; i++){
+      var size = 22 + Math.random() * 30, dur = 2.2 + Math.random() * 1.8, delay = Math.random() * 1.6;
+      h += PUMP.replace('class="hw-p"', 'class="hw-p" style="left:' + (Math.random() * 96).toFixed(1) + '%;width:' + size.toFixed(0) + 'px;height:' + (size * .94).toFixed(0) + 'px;--rot:' + ((Math.random() * 2 - 1) * 320).toFixed(0) + 'deg;animation-duration:' + dur.toFixed(2) + 's;animation-delay:' + delay.toFixed(2) + 's;transform:translateY(-80px)"');
+    }
+    box.innerHTML = h;
+    document.body.appendChild(box);
+    setTimeout(function(){ if (box.parentNode) box.parentNode.removeChild(box); }, 6000);
+  }
+  /* Grande citrouille de l'accueil : un clic déclenche la pluie de citrouilles */
+  var base = render, timer = null;
+  render = function(){
+    base();
+    var head = S.view === 'home' && app.querySelector('.home-head');
+    if (!head) return;
+    var b = document.createElement('button');
+    b.className = 'hw-big'; b.type = 'button'; b.setAttribute('aria-label', 'Citrouille d\'Halloween');
+    b.innerHTML = PUMP;
+    b.onclick = function(){
+      if (document.querySelector('.hw-rain')) return;
+      clearTimeout(timer);
+      b.classList.add('lit');
+      timer = setTimeout(function(){ b.classList.remove('lit'); }, 4500);
+      rain();
+    };
+    head.appendChild(b);
+  };
+})();
+
+/* ---------- Démarrage ---------- */
+if (OUVRIR_SUR){ var f0 = findPartie(OUVRIR_SUR); if (f0){ S.niveau = f0.niveau; S.view = 'partie'; S.partie = f0.p; S.chap = f0.ch; } }
+render();
+</script>
+</body>
+</html>
