@@ -1808,5 +1808,50 @@ if (HALLOWEEN) (function(){
 if (OUVRIR_SUR){ var f0 = findPartie(OUVRIR_SUR); if (f0){ S.niveau = f0.niveau; S.view = 'partie'; S.partie = f0.p; S.chap = f0.ch; } }
 render();
 </script>
+<!-- =====================================================================
+     STATISTIQUES DE VISITES (GoatCounter : sans cookie, sans donnée personnelle)
+     Tableau de bord : https://michalaksvt.goatcounter.com
+     Compte l'ouverture du site, chaque page ouverte (partie, glossaire,
+     méthodes…) et chaque QCM lancé. Pour arrêter : supprimer ce bloc.
+     ===================================================================== -->
+<script>
+(function(){
+  var base = location.pathname.replace(/index\.html$/, '');
+  var dernier = null;
+  function cle(){
+    if (typeof S === 'undefined') return null;
+    if (S.view === 'partie' && S.partie) return 'partie-' + S.partie.id;
+    if (S.view === 'methode' && S.methode) return 'methode-' + S.methode;
+    return S.view || 'home';
+  }
+  function compter(path, titre, evenement){
+    try {
+      if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: titre, event: !!evenement});
+    } catch(e){}
+  }
+  /* Chaque changement de page dans le site */
+  if (typeof render === 'function'){
+    var avant = render;
+    dernier = cle();   /* la page d'ouverture est déjà comptée par count.js */
+    render = function(){
+      avant.apply(this, arguments);
+      var k = cle();
+      if (k && k !== dernier){
+        dernier = k;
+        var t = k.indexOf('partie-') === 0 ? 'Partie ' + k.slice(7) + (S.partie && S.partie.titre ? ' · ' + S.partie.titre : '') : k;
+        compter(base + k, t);
+      }
+    };
+  }
+  /* Chaque QCM lancé (bouton « Commencer ») */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('#go') : null;
+    if (!b) return;
+    var ou = typeof S !== 'undefined' && S.view === 'partie' && S.partie ? S.partie.id : 'tout-reviser';
+    compter(base + 'qcm-' + ou, 'QCM lancé : ' + ou, true);
+  }, true);
+})();
+</script>
+<script data-goatcounter="https://michalaksvt.goatcounter.com/count" data-goatcounter-settings='{"allow_frame": true}' async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
