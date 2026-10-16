@@ -1881,14 +1881,37 @@ if (SURLIGNEUR) (function(){
       n.parentNode.insertBefore(m, n); m.appendChild(n);
     });
   }
+  /* Retrouve la position de chaque surlignage dans le texte de la zone */
+  function position(t, s){
+    var k = -1, j = t.indexOf(s.t);
+    while (j > -1){ if (!s.p || t.slice(Math.max(0, j - s.p.length), j) === s.p){ k = j; break; } j = t.indexOf(s.t, j + 1); }
+    if (k < 0) k = t.indexOf(s.t);
+    return k;
+  }
+  /* Fusionne les surlignages qui se chevauchent : jamais deux couches sur le même texte.
+     La couleur du surlignage le plus récent l'emporte. */
+  function normaliser(zone, t){
+    var k = zone.getAttribute('data-hl'), liste = data[k];
+    if (!liste || !liste.length) return;
+    var trouves = [], perdus = [];
+    liste.forEach(function(s, i){ var a = position(t, s); if (a > -1) trouves.push({a: a, b: a + s.t.length, c: s.c, i: i}); else perdus.push(s); });
+    trouves.sort(function(x, y){ return x.a - y.a || x.i - y.i; });
+    var fus = [];
+    trouves.forEach(function(x){
+      var d = fus[fus.length - 1];
+      if (d && x.a < d.b){ d.b = Math.max(d.b, x.b); if (x.i > d.i){ d.c = x.c; d.i = x.i; } }
+      else fus.push({a: x.a, b: x.b, c: x.c, i: x.i});
+    });
+    var neuf = fus.map(function(x){ return {t: t.slice(x.a, x.b), p: t.slice(Math.max(0, x.a - 30), x.a), c: x.c}; }).concat(perdus);
+    if (JSON.stringify(neuf) !== JSON.stringify(liste)){ data[k] = neuf; sauver(); }
+  }
   function appliquer(zone){
     occupe = true;
     nettoyer(zone);
+    normaliser(zone, textes(zone).texte);
     var liste = data[zone.getAttribute('data-hl')] || [];
     liste.forEach(function(s, i){
-      var t = textes(zone).texte, k = -1, j = t.indexOf(s.t);
-      while (j > -1){ if (!s.p || t.slice(Math.max(0, j - s.p.length), j) === s.p){ k = j; break; } j = t.indexOf(s.t, j + 1); }
-      if (k < 0) k = t.indexOf(s.t);
+      var k = position(textes(zone).texte, s);
       if (k > -1) envelopper(zone, k, k + s.t.length, s.c, i);
     });
     occupe = false;
@@ -1909,7 +1932,7 @@ if (SURLIGNEUR) (function(){
 
   /* 2. Surligner, recolorer, effacer */
   var outil = 'couleur';   /* 'couleur' = surligneur, 'gomme' = gomme */
-  var LETTRE; try { LETTRE = new RegExp("[\\p{L}\\p{N}'’-]", 'u'); } catch(e){ LETTRE = /[A-Za-zÀ-ÖØ-öø-ÿŒœ0-9'’-]/; }
+  var LETTRE; try { LETTRE = new RegExp("[\\p{L}\\p{N}-]", 'u'); } catch(e){ LETTRE = /[A-Za-zÀ-ÖØ-öø-ÿŒœ0-9-]/; }
   function zoneDe(noeud){ var e = noeud && (noeud.nodeType === 1 ? noeud : noeud.parentNode); return e && e.closest ? e.closest('[data-hl]') : null; }
   function decalage(zone, noeud, off){
     var r = document.createRange(); r.selectNodeContents(zone); r.setEnd(noeud, off);
