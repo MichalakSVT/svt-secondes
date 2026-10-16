@@ -340,6 +340,43 @@ html.hw .home-head{position:relative}
 @keyframes hwFall{from{transform:translateY(-80px) rotate(0)}to{transform:translateY(calc(100vh + 80px)) rotate(var(--rot))}}
 @media (max-width:480px){html.hw .home-head h1{padding-right:56px}}
 
+/* ---------- Surligneur ---------- */
+.surl{color:inherit;border-radius:3px;padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.surl.sj{background:rgba(253,224,71,.62)}
+.surl.sv{background:rgba(134,239,172,.62)}
+.surl.sb{background:rgba(147,197,253,.65)}
+.surl.sr{background:rgba(249,168,212,.62)}
+html.th-sombre .surl.sj{background:rgba(250,204,21,.38)}
+html.th-sombre .surl.sv{background:rgba(74,222,128,.32)}
+html.th-sombre .surl.sb{background:rgba(96,165,250,.38)}
+html.th-sombre .surl.sr{background:rgba(244,114,182,.36)}
+html.surl-on .surl{cursor:pointer}
+html.surl-on .opt,html.surl-on .opt *,html.surl-on button.term,html.surl-on .face{-webkit-user-select:text;user-select:text}
+html.surl-ok main{padding-bottom:110px}
+.surl-fab{position:fixed;right:16px;bottom:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:45;width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px solid var(--line-2);box-shadow:0 8px 20px -8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:var(--ink);transition:transform .15s}
+.surl-fab:active{transform:scale(.94)}
+.surl-fab svg{width:26px;height:26px}
+.surl-bar{position:fixed;left:50%;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:46;display:none;flex-direction:column;gap:8px;width:max-content;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--line-2);border-radius:16px;padding:10px 12px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);letter-spacing:normal;word-spacing:normal}
+html.surl-on .surl-bar{display:flex;animation:surlIn .25s var(--ease)}
+@keyframes surlIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+html.surl-on .surl-fab{display:none}
+.surl-hint{margin:0;font-size:13px;line-height:1.35;color:var(--muted);text-align:center}
+.surl-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.surl-col{width:32px;height:32px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line-2)}
+.surl-col.on{box-shadow:0 0 0 2px var(--ink)}
+.surl-col[data-c="sj"]{background:#fde047}.surl-col[data-c="sv"]{background:#86efac}.surl-col[data-c="sb"]{background:#93c5fd}.surl-col[data-c="sr"]{background:#f9a8d4}
+.surl-row .btn{min-height:40px;padding:7px 16px;font-size:14px}
+.surl-col{width:38px;height:38px}
+.surl-tool{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;border-radius:999px;border:1px solid var(--line-2);font-size:14px;font-weight:600;color:var(--ink-2)}
+.surl-tool svg{width:20px;height:20px}
+.surl-tool.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+html.surl-gomme .surl{cursor:pointer;outline:1.5px dashed rgba(0,0,0,.35);outline-offset:1px}
+html.th-sombre.surl-gomme .surl{outline-color:rgba(255,255,255,.4)}
+html.surl-cache .surl-fab,html.surl-cache .surl-bar{display:none!important}
+html.surl-cache main{padding-bottom:56px}
+.surl-msg{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:47;background:var(--ink);color:var(--paper);font-size:14px;padding:8px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s;max-width:calc(100vw - 32px);text-align:center}
+.surl-msg.show{opacity:1}
+
 /* ---------- Glossaire : tri par chapitre ---------- */
 .gl-filters{margin:4px 0 12px}
 .gl-filters .chips + .chips,.gl-chname + .chips{margin-top:8px}
@@ -1419,7 +1456,7 @@ function renderGlossaire(){
 
 /* ---------- Réglages de lecture ---------- */
 /* Par défaut : taille normale, police Lexend, espacement normal, thème papier */
-var REG = {taille: 1, police: 'lex', espace: 'n', theme: 'papier'};
+var REG = {taille: 1, police: 'lex', espace: 'n', theme: 'papier', surl: 'oui'};
 try { var r0 = JSON.parse(localStorage.getItem('svt2nde_reglages_v2')); if (r0) for (var k0 in r0) REG[k0] = r0[k0]; } catch(e){}
 var TAILLES = ['93.75%', '100%', '112.5%', '125%'];
 function applyReg(){
@@ -1429,6 +1466,8 @@ function applyReg(){
   r.classList.toggle('sp-wide', REG.espace === 'w');
   r.classList.toggle('th-clair', REG.theme === 'clair');
   r.classList.toggle('th-sombre', REG.theme === 'sombre');
+  r.classList.toggle('surl-cache', REG.surl === 'non');
+  if (REG.surl === 'non' && window.SURL_FERMER) window.SURL_FERMER();
   try { localStorage.setItem('svt2nde_reglages_v2', JSON.stringify(REG)); } catch(e){}
 }
 function pillRow(label, key, opts){
@@ -1442,7 +1481,8 @@ function drawSettings(){
     + pillRow('Taille du texte', 'taille', [[0, 'A−', 'font-size:.78rem'], [1, 'A', 'font-size:.86rem'], [2, 'A+', 'font-size:.96rem'], [3, 'A++', 'font-size:1.06rem']])
     + pillRow('Police', 'police', [['lex', 'Lexend'], ['std', 'Classique']])
     + pillRow('Espacement', 'espace', [['n', 'Normal'], ['w', 'Élargi']])
-    + '<p class="note">Lexend est une police conçue pour faciliter la lecture. L\'espacement élargi ajoute de l\'espace entre les lettres, les mots et les lignes, et aligne le texte à gauche (utile en cas de dyslexie).</p>';
+    + pillRow('Bouton surligneur', 'surl', [['oui', 'Affiché'], ['non', 'Masqué']])
+    + '<p class="note">Lexend est une police conçue pour faciliter la lecture. L\'espacement élargi ajoute de l\'espace entre les lettres, les mots et les lignes, et aligne le texte à gauche (utile en cas de dyslexie). Masquer le surligneur enlève le bouton rond, mais garde tes surlignages.</p>';
   s.querySelectorAll('[data-set]').forEach(function(b){
     b.onclick = function(){
       var key = b.dataset.set, v = b.dataset.val;
@@ -1472,7 +1512,8 @@ var TUTO = [
  {t: "Les mots du cours et le glossaire", h: "<div class=\"tuto-demo\"><span class=\"dterm\">matrice extracellulaire</span></div><ul><li>Dans le cours, les mots <b>soulignés en pointillés</b> ont une définition : passe la souris dessus ou touche-les pour l'afficher.</li><li>Le bouton <b>Glossaire</b>, en haut, rassemble tous les mots du cours, classés par ordre alphabétique.</li><li>La recherche du glossaire accepte les petites fautes d'orthographe, et chaque mot indique les parties où il est utilisé.</li></ul>"},
  {t: "Réviser avec les flashcards", h: "<ul><li>Chaque carte a un mot-clé d'un côté et sa définition de l'autre. <b>Touche la carte</b> (ou appuie sur Espace) pour la retourner.</li><li>Réponds honnêtement avec <b>Je savais</b> ou <b>À revoir</b> : à la fin, tu vois ton score et tu peux revoir seulement les cartes ratées.</li><li><b>Une par une</b> ou <b>Toutes</b> : une carte à la fois, ou toutes les cartes affichées d'un coup.</li><li><b>Mot d'abord</b> ou <b>Définition d'abord</b> : pour t'entraîner dans les deux sens.</li><li>Pour changer de carte, fais glisser ton doigt ou utilise les flèches.</li></ul>"},
  {t: "S'entraîner avec les QCM", h: "<ul><li>Choisis un <b>niveau</b> (facile, moyen, difficile ou tous) et le <b>nombre de questions</b>.</li><li>Après chaque réponse, une <b>explication</b> s'affiche, que tu aies juste ou non.</li><li>Les questions et les réponses sont mélangées à chaque essai.</li><li>À la fin, tu peux revoir tes erreurs. Ton <b>meilleur score</b> est gardé sur ton appareil.</li><li>Sur l'accueil, <b>Tout réviser</b> mélange les flashcards et les QCM de toutes les parties : idéal avant un contrôle.</li></ul>"},
- {t: "Adapter l'affichage", h: "<p>Le bouton <b>Aa</b>, en haut à droite, permet de régler la lecture selon tes besoins :</p><ul><li><b>Thème</b> : vert, clair ou sombre.</li><li><b>Taille du texte</b> : de A− à A++.</li><li><b>Police</b> : Lexend, conçue pour faciliter la lecture, ou une police classique.</li><li><b>Espacement élargi</b> : plus d'espace entre les lettres, les mots et les lignes (utile en cas de dyslexie).</li></ul><p>Tes réglages sont gardés pour tes prochaines visites.</p>"},
+ {t: "Surligner", h: "<p>Le <b>bouton rond</b>, en bas à droite de l'écran, ouvre le surligneur. Il fonctionne partout : cours, activités, flashcards, QCM, méthodes et glossaire.</p><ul><li><b>Pour surligner</b> : choisis une couleur, puis <b>touche un mot</b>. Pour un passage plus long, fais un <b>appui long</b> sur le texte, étire la sélection et lève le doigt : le passage se surligne tout seul. Sur ordinateur, sélectionne le texte à la souris.</li><li><b>Pour effacer</b> : choisis la <b>Gomme</b>, puis touche un surlignage ou sélectionne un passage. « Tout effacer » vide la page affichée.</li><li>Tant que le surligneur est ouvert, les flashcards ne se retournent pas et les réponses du QCM ne se valident pas : touche <b>Fermer</b> pour reprendre.</li><li>Tes surlignages sont <b>gardés sur ton appareil</b>, pour tes prochaines visites. Ils ne passent pas d'un appareil à l'autre.</li></ul>"},
+ {t: "Adapter l'affichage", h: "<p>Le bouton <b>Aa</b>, en haut à droite, permet de régler la lecture selon tes besoins :</p><ul><li><b>Thème</b> : vert, clair ou sombre.</li><li><b>Taille du texte</b> : de A− à A++.</li><li><b>Police</b> : Lexend, conçue pour faciliter la lecture, ou une police classique.</li><li><b>Espacement élargi</b> : plus d'espace entre les lettres, les mots et les lignes (utile en cas de dyslexie).</li><li><b>Bouton surligneur</b> : affiché ou masqué. Le masquer garde tes surlignages.</li></ul><p>Tes réglages sont gardés pour tes prochaines visites.</p>"},
  {t: "Comment bien réviser ?", h: "<ul><li><b>1.</b> Lis <b>L'essentiel</b> et vérifie que tu comprends les mots soulignés.</li><li><b>2.</b> Relis les corrections des <b>Activités</b> que tu n'as pas réussies.</li><li><b>3.</b> Fais les <b>flashcards</b> jusqu'à ne plus avoir de carte à revoir.</li><li><b>4.</b> Termine par le <b>QCM</b>, du niveau facile au niveau difficile.</li></ul><p>Bon travail !</p>"}
 ];
 var tutoI = 0, tutoFocus = null;
@@ -1796,6 +1837,223 @@ function renderQcm(tab, bank, key){
   }
   intro();
 }
+
+/* ---------- Surligneur ----------
+   Les élèves surlignent n'importe quel texte (cours, activités, flashcards, QCM, méthodes,
+   glossaire). Les surlignages sont enregistrés sur l'appareil (localStorage), retrouvés
+   grâce au texte surligné : ils restent en place tant que le texte du cours ne change pas. */
+var SURLIGNEUR = true;
+if (SURLIGNEUR) (function(){
+  var CLE = 'surlignages', data = store(CLE) || {}, couleur = store('surl_couleur') || 'sj';
+  var actif = false, occupe = false, dernierRange = null, dernierAjout = 0;
+  function hash(s){ var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+  function sauver(){ store(CLE, data); }
+
+  /* 1. Zones surlignables : chaque bloc de texte reçoit une clé stable */
+  var ZONES = [
+    ['.lesson', function(){ return S.partie ? 'ess-' + S.partie.id : null; }],
+    ['.acc-body', function(el){ var a = el.closest('.acc'); return S.partie && a ? 'act-' + S.partie.id + '-' + a.id : null; }],
+    ['.face .term-big, .face .def', function(el){ return 'fc-' + hash(el.textContent); }],
+    ['.q-text', function(el){ return 'q-' + hash(el.textContent); }],
+    ['.opt > span:last-child', function(el){ return 'qo-' + hash(el.textContent); }],
+    ['.feedback', function(el){ return 'qf-' + hash(el.textContent); }],
+    ['.m-flow, .m-steps, .m-ex, .m-err', function(el){ return S.methode ? 'meth-' + S.methode + '-' + el.className.split(' ')[0] + '-' + hash(el.textContent).slice(0, 4) : null; }],
+    ['.gl-item p', function(el){ return 'gl-' + hash(el.textContent); }]
+  ];
+  function textes(zone){
+    var w = document.createTreeWalker(zone, NodeFilter.SHOW_TEXT, null), n, out = [], pos = 0;
+    while ((n = w.nextNode())){ out.push({n: n, d: pos}); pos += n.nodeValue.length; }
+    return {noeuds: out, texte: out.map(function(x){ return x.n.nodeValue; }).join('')};
+  }
+  function nettoyer(zone){
+    zone.querySelectorAll('mark.surl').forEach(function(m){ var p = m.parentNode; while (m.firstChild) p.insertBefore(m.firstChild, m); p.removeChild(m); });
+    zone.normalize();
+  }
+  function envelopper(zone, debut, fin, c, i){
+    textes(zone).noeuds.forEach(function(x){
+      var a = Math.max(debut, x.d), b = Math.min(fin, x.d + x.n.nodeValue.length);
+      if (a >= b) return;
+      var n = x.n;
+      if (b < x.d + n.nodeValue.length) n.splitText(b - x.d);
+      if (a > x.d) n = n.splitText(a - x.d);
+      if (!n.nodeValue.trim()) return;
+      var m = document.createElement('mark'); m.className = 'surl ' + c; m.setAttribute('data-i', i);
+      n.parentNode.insertBefore(m, n); m.appendChild(n);
+    });
+  }
+  function appliquer(zone){
+    occupe = true;
+    nettoyer(zone);
+    var liste = data[zone.getAttribute('data-hl')] || [];
+    liste.forEach(function(s, i){
+      var t = textes(zone).texte, k = -1, j = t.indexOf(s.t);
+      while (j > -1){ if (!s.p || t.slice(Math.max(0, j - s.p.length), j) === s.p){ k = j; break; } j = t.indexOf(s.t, j + 1); }
+      if (k < 0) k = t.indexOf(s.t);
+      if (k > -1) envelopper(zone, k, k + s.t.length, s.c, i);
+    });
+    occupe = false;
+  }
+  function scanner(){
+    if (occupe) return;
+    ZONES.forEach(function(z){
+      document.querySelectorAll('#app ' + z[0].split(', ').join(', #app ')).forEach(function(el){
+        if (el.hasAttribute('data-hl') || el.parentNode.closest('[data-hl]')) return;
+        var k = z[1](el); if (!k) return;
+        el.setAttribute('data-hl', k);
+        if (data[k] && data[k].length) appliquer(el);
+      });
+    });
+  }
+  var plan = false;
+  new MutationObserver(function(){ if (occupe || plan) return; plan = true; setTimeout(function(){ plan = false; scanner(); }, 0); }).observe(app, {childList: true, subtree: true});
+
+  /* 2. Surligner, recolorer, effacer */
+  var outil = 'couleur';   /* 'couleur' = surligneur, 'gomme' = gomme */
+  var LETTRE; try { LETTRE = new RegExp("[\\p{L}\\p{N}'’-]", 'u'); } catch(e){ LETTRE = /[A-Za-zÀ-ÖØ-öø-ÿŒœ0-9'’-]/; }
+  function zoneDe(noeud){ var e = noeud && (noeud.nodeType === 1 ? noeud : noeud.parentNode); return e && e.closest ? e.closest('[data-hl]') : null; }
+  function decalage(zone, noeud, off){
+    var r = document.createRange(); r.selectNodeContents(zone); r.setEnd(noeud, off);
+    return r.toString().length;
+  }
+  function selectionUtile(){
+    var s = window.getSelection();
+    if (!s || !s.rangeCount || s.isCollapsed) return null;
+    var r = s.getRangeAt(0);
+    return zoneDe(r.startContainer) || zoneDe(r.endContainer) ? r : null;
+  }
+  function viderSelection(){ try { window.getSelection().removeAllRanges(); } catch(e){} }
+  function ajouter(zone, a, b){
+    var t = textes(zone).texte;
+    while (a < b && /\s/.test(t.charAt(a))) a++;
+    while (b > a && /\s/.test(t.charAt(b - 1))) b--;
+    if (b - a < 1) return false;
+    var k = zone.getAttribute('data-hl');
+    (data[k] = data[k] || []).push({t: t.slice(a, b), p: t.slice(Math.max(0, a - 30), a), c: couleur});
+    sauver(); appliquer(zone);
+    return true;
+  }
+  function surlignerSelection(r){
+    var z1 = zoneDe(r.startContainer), z2 = zoneDe(r.endContainer);
+    if (!z1 || z1 !== z2){ viderSelection(); message('Surligne un paragraphe à la fois.'); return; }
+    ajouter(z1, decalage(z1, r.startContainer, r.startOffset), decalage(z1, r.endContainer, r.endOffset));
+    viderSelection();
+  }
+  function retirer(liste){
+    /* liste : [{zone, i}] ; on retire en partant de la fin pour garder les bons numéros */
+    var parZone = new Map();
+    liste.forEach(function(x){ if (!parZone.has(x.zone)) parZone.set(x.zone, []); if (parZone.get(x.zone).indexOf(x.i) < 0) parZone.get(x.zone).push(x.i); });
+    parZone.forEach(function(ids, zone){
+      var k = zone.getAttribute('data-hl');
+      ids.sort(function(a, b){ return b - a; }).forEach(function(i){ if (data[k]) data[k].splice(i, 1); });
+      if (data[k] && !data[k].length) delete data[k];
+      appliquer(zone);
+    });
+    sauver();
+  }
+  function effacerSelection(r){
+    var l = [];
+    app.querySelectorAll('mark.surl').forEach(function(m){ if (r.intersectsNode(m)) l.push({zone: m.closest('[data-hl]'), i: +m.getAttribute('data-i')}); });
+    viderSelection();
+    if (l.length) retirer(l); else message('Aucun surlignage dans cette sélection.');
+  }
+  function recolorer(m){
+    var z = m.closest('[data-hl]'), k = z.getAttribute('data-hl'), i = +m.getAttribute('data-i');
+    if (data[k] && data[k][i] && data[k][i].c !== couleur){ data[k][i].c = couleur; sauver(); appliquer(z); }
+  }
+  /* Le mot sous le doigt ou sous la souris */
+  function motAuPoint(x, y){
+    var n, o;
+    if (document.caretRangeFromPoint){ var r = document.caretRangeFromPoint(x, y); if (!r) return null; n = r.startContainer; o = r.startOffset; }
+    else if (document.caretPositionFromPoint){ var p = document.caretPositionFromPoint(x, y); if (!p) return null; n = p.offsetNode; o = p.offset; }
+    else return null;
+    if (!n || n.nodeType !== 3) return null;
+    var z = zoneDe(n); if (!z) return null;
+    var t = textes(z).texte, i = decalage(z, n, o);
+    if (!LETTRE.test(t.charAt(i)) && i > 0 && LETTRE.test(t.charAt(i - 1))) i--;
+    if (!LETTRE.test(t.charAt(i))) return null;
+    var a = i, b = i;
+    while (a > 0 && LETTRE.test(t.charAt(a - 1))) a--;
+    while (b < t.length && LETTRE.test(t.charAt(b))) b++;
+    return {z: z, a: a, b: b};
+  }
+  function effacerPage(){
+    var zones = app.querySelectorAll('[data-hl]'), n = 0;
+    zones.forEach(function(z){ var k = z.getAttribute('data-hl'); if (data[k]) n += data[k].length; });
+    if (!n){ message('Aucun surlignage sur cette page.'); return; }
+    if (!confirm('Effacer les ' + n + ' surlignage' + (n > 1 ? 's' : '') + ' de cette page ?')) return;
+    zones.forEach(function(z){ delete data[z.getAttribute('data-hl')]; appliquer(z); });
+    sauver();
+  }
+  /* 3. Interface : bouton rond en bas à droite, barre d'outils quand il est actif */
+  var ICONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5l4 4L10 18H6v-4z"/><path d="M13 7l4 4"/><path d="M4 21h9" stroke="#e0b400" stroke-width="3"/></svg>';
+  var GOMME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h13"/><path d="M4.6 14.6l9.2-9.2a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12 18.8a2 2 0 0 1-1.4.6H8.4a2 2 0 0 1-1.4-.6l-2.4-2.4a2 2 0 0 1 0-2.8z"/><path d="M9 10l5 5"/></svg>';
+  var fab = document.createElement('button');
+  fab.className = 'surl-fab'; fab.type = 'button'; fab.setAttribute('aria-label', 'Ouvrir le surligneur'); fab.title = 'Surligneur';
+  fab.innerHTML = ICONE;
+  var bar = document.createElement('div');
+  bar.className = 'surl-bar'; bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'Surligneur');
+  var cols = [['sj', 'Jaune'], ['sv', 'Vert'], ['sb', 'Bleu'], ['sr', 'Rose']];
+  bar.innerHTML = '<p class="surl-hint" id="surlHint"></p><div class="surl-row">'
+    + cols.map(function(c){ return '<button type="button" class="surl-col" data-c="' + c[0] + '" aria-label="Surligneur ' + c[1].toLowerCase() + '" title="' + c[1] + '"></button>'; }).join('')
+    + '<button type="button" class="surl-tool" id="surlGomme" aria-label="Gomme" title="Gomme">' + GOMME + '<span>Gomme</span></button>'
+    + '</div><div class="surl-row"><button type="button" class="btn" id="surlClear">Tout effacer</button><button type="button" class="btn solid" id="surlX">Fermer</button></div>';
+  var msg = document.createElement('div'); msg.className = 'surl-msg'; msg.setAttribute('role', 'status');
+  document.body.appendChild(fab); document.body.appendChild(bar); document.body.appendChild(msg);
+  document.documentElement.classList.add('surl-ok');
+  var msgT = null;
+  function message(t){ msg.textContent = t; msg.classList.add('show'); clearTimeout(msgT); msgT = setTimeout(function(){ msg.classList.remove('show'); }, 2200); }
+  function majBarre(){
+    bar.querySelectorAll('.surl-col').forEach(function(b){ b.classList.toggle('on', outil === 'couleur' && b.dataset.c === couleur); });
+    $('surlGomme').classList.toggle('on', outil === 'gomme');
+    $('surlHint').textContent = outil === 'gomme'
+      ? 'Gomme : touche un surlignage, ou sélectionne un passage, pour l\'effacer.'
+      : 'Touche un mot, ou sélectionne un passage, pour le surligner.';
+    document.documentElement.classList.toggle('surl-gomme', outil === 'gomme');
+  }
+  function basculer(on){
+    actif = on; document.documentElement.classList.toggle('surl-on', on);
+    if (on){ outil = 'couleur'; majBarre(); hideTip(); } else { viderSelection(); document.documentElement.classList.remove('surl-gomme'); }
+  }
+  window.SURL_FERMER = function(){ if (actif) basculer(false); };
+  fab.onclick = function(){ basculer(true); };
+  $('surlX').onclick = function(){ basculer(false); };
+  $('surlClear').onclick = effacerPage;
+  $('surlGomme').onclick = function(){ outil = 'gomme'; majBarre(); };
+  bar.querySelectorAll('.surl-col').forEach(function(b){ b.onclick = function(){ couleur = b.dataset.c; outil = 'couleur'; store('surl_couleur', couleur); majBarre(); }; });
+  /* Les boutons de la barre ne doivent pas faire perdre la sélection */
+  bar.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  /* Agir sur une sélection (souris ou appui long sur téléphone) */
+  function agirSelection(){
+    var r = selectionUtile(); if (!r) return false;
+    if (outil === 'gomme') effacerSelection(r); else surlignerSelection(r);
+    dernierAjout = Date.now();
+    return true;
+  }
+  /* Sur téléphone : on attend que le doigt soit levé et que la sélection ne bouge plus */
+  var appui = false, attente = null;
+  function planifier(){ clearTimeout(attente); attente = setTimeout(function(){ if (actif && !appui) agirSelection(); }, 800); }
+  document.addEventListener('touchstart', function(e){ if (!bar.contains(e.target)){ appui = true; clearTimeout(attente); } }, {passive: true});
+  document.addEventListener('touchend', function(){ if (actif){ appui = false; planifier(); } }, {passive: true});
+  document.addEventListener('mousedown', function(e){ if (!bar.contains(e.target)){ appui = true; clearTimeout(attente); } });
+  document.addEventListener('mouseup', function(){ appui = false; });
+  document.addEventListener('selectionchange', function(){ if (actif && !appui && selectionUtile()) planifier(); });
+  /* Un toucher ou un clic : sélection, surlignage existant, ou mot */
+  document.addEventListener('click', function(e){
+    if (!actif || bar.contains(e.target) || fab.contains(e.target)) return;
+    var stop = function(){ e.preventDefault(); e.stopPropagation(); dernierAjout = Date.now(); };
+    if (agirSelection()){ stop(); return; }
+    var m = e.target.closest && e.target.closest('mark.surl');
+    if (m){ if (outil === 'gomme') retirer([{zone: m.closest('[data-hl]'), i: +m.getAttribute('data-i')}]); else recolorer(m); stop(); return; }
+    if (outil === 'couleur'){
+      var w = motAuPoint(e.clientX, e.clientY);
+      if (w){ ajouter(w.z, w.a, w.b); stop(); return; }
+    }
+    /* En mode surligneur, un toucher ne retourne pas la flashcard et ne valide pas le QCM */
+    if (e.target.closest && e.target.closest('.flash, .opt')) stop();
+  }, true);
+  document.addEventListener('keydown', function(e){ if (actif && e.key === 'Escape') basculer(false); });
+  scanner();
+})();
 
 /* ---------- Halloween : toiles dans les coins et citrouilles ----------
    Pour l'enlever après la période : mettre  HALLOWEEN = false  tout en haut du script. */
