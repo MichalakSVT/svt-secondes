@@ -2136,48 +2136,56 @@ render();
 </script>
 <!-- =====================================================================
      STATISTIQUES DE VISITES (GoatCounter : sans cookie, sans donnée personnelle)
-     Tableau de bord : https://michalaksvt.goatcounter.com
-     Compte l'ouverture du site, chaque page ouverte (partie, glossaire,
-     méthodes…) et chaque QCM lancé. Pour arrêter : supprimer ce bloc.
+     Tableau de bord : https://michalaksvt-2nde.goatcounter.com
+     Compte seulement de grandes catégories : ouverture du site, cours, activités,
+     flashcards, QCM lancé, méthodes, glossaire, tout réviser.
+     Pour arrêter : supprimer ce bloc.
      ===================================================================== -->
 <script>
 (function(){
-  var base = location.pathname.replace(/index\.html$/, '');
+  var COMPTEUR = 'https://michalaksvt-2nde.goatcounter.com/count';
+  var CATEGORIES = {
+    ouverture: 'Ouverture du site', cours: 'Cours', activites: 'Activités', flashcards: 'Flashcards',
+    qcm: 'QCM lancé', methodes: 'Méthodes', glossaire: 'Glossaire', revision: 'Tout réviser'
+  };
+  var file = [], pret = false;
+  function compter(cat){
+    if (!CATEGORIES[cat]) return;
+    var o = {path: '/' + cat, title: CATEGORIES[cat]};
+    if (pret) { try { window.goatcounter.count(o); } catch(e){} } else file.push(o);
+  }
+  /* Le script de GoatCounter ne compte rien tout seul (no_onload) : c'est nous qui envoyons les catégories */
+  window.goatcounter = {no_onload: true, allow_frame: true};
+  var s = document.createElement('script');
+  s.async = true; s.src = 'https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter', COMPTEUR);
+  s.onload = function(){ pret = !!(window.goatcounter && window.goatcounter.count); if (pret) file.splice(0).forEach(function(o){ try { window.goatcounter.count(o); } catch(e){} }); };
+  document.head.appendChild(s);
+
+  var ONGLET = {essentiel: 'cours', activites: 'activites', flashcards: 'flashcards'};
+  var VUE = {glossaire: 'glossaire', methodes: 'methodes', revision: 'revision'};
   var dernier = null;
-  function cle(){
+  function etat(){
     if (typeof S === 'undefined') return null;
-    if (S.view === 'partie' && S.partie) return 'partie-' + S.partie.id;
-    if (S.view === 'methode' && S.methode) return 'methode-' + S.methode;
-    return S.view || 'home';
+    if (S.view === 'partie' && S.partie) return {cle: 'p:' + S.partie.id + ':' + S.tab, cat: ONGLET[S.tab]};
+    return {cle: 'v:' + S.view, cat: VUE[S.view]};
   }
-  function compter(path, titre, evenement){
-    try {
-      if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: titre, event: !!evenement});
-    } catch(e){}
+  function suivre(){
+    var e = etat(); if (!e || e.cle === dernier) return;
+    dernier = e.cle;
+    if (e.cat) compter(e.cat);
   }
-  /* Chaque changement de page dans le site */
-  if (typeof render === 'function'){
-    var avant = render;
-    dernier = cle();   /* la page d'ouverture est déjà comptée par count.js */
-    render = function(){
-      avant.apply(this, arguments);
-      var k = cle();
-      if (k && k !== dernier){
-        dernier = k;
-        var t = k.indexOf('partie-') === 0 ? 'Partie ' + k.slice(7) + (S.partie && S.partie.titre ? ' · ' + S.partie.titre : '') : k;
-        compter(base + k, t);
-      }
-    };
-  }
-  /* Chaque QCM lancé (bouton « Commencer ») */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest ? e.target.closest('#go') : null;
-    if (!b) return;
-    var ou = typeof S !== 'undefined' && S.view === 'partie' && S.partie ? S.partie.id : 'tout-reviser';
-    compter(base + 'qcm-' + ou, 'QCM lancé : ' + ou, true);
+  compter('ouverture');
+  var e0 = etat(); dernier = e0 ? e0.cle : null;
+  if (e0 && e0.cle.indexOf('p:') === 0 && e0.cat) compter(e0.cat);   /* site ouvert directement sur une partie */
+  /* Changements de page et d'onglet */
+  if (typeof render === 'function'){ var r0 = render; render = function(){ r0.apply(this, arguments); suivre(); }; }
+  if (typeof switchTab === 'function'){ var t0 = switchTab; switchTab = function(){ t0.apply(this, arguments); suivre(); }; }
+  /* Chaque QCM lancé (bouton « Commencer »), où qu'il soit */
+  document.addEventListener('click', function(ev){
+    if (ev.target && ev.target.closest && ev.target.closest('#go')) compter('qcm');
   }, true);
 })();
 </script>
-<script data-goatcounter="https://michalaksvt.goatcounter.com/count" data-goatcounter-settings='{"allow_frame": true}' async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
